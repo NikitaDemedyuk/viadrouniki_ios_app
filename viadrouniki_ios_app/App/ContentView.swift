@@ -1,24 +1,31 @@
-//
-//  ContentView.swift
-//  viadrouniki_ios_app
-//
-//  Created by Никита on 06.07.2026.
-//
-
 import SwiftUI
 
 struct ContentView: View {
+    @Environment(AppViewModel.self) private var appViewModel
+
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Viadrouniki ios app!")
+        TabView {
+            TripListView()
+                .tabItem { Label("Trips", systemImage: "map") }
+
+            PointsView()
+                .tabItem { Label("Points", systemImage: "mappin.and.ellipse") }
+
+            VehicleListView()
+                .tabItem { Label("Vehicles", systemImage: "car") }
+
+            if appViewModel.isLoggedIn {
+                ProfileView()
+                    .tabItem { Label("Profile", systemImage: "person.crop.circle") }
+            } else {
+                LoginView()
+                    .tabItem { Label("Login", systemImage: "person.badge.key") }
+            }
         }
-        .padding()
     }
 }
 
 #Preview {
     ContentView()
+        .environment(AppViewModel())
 }
