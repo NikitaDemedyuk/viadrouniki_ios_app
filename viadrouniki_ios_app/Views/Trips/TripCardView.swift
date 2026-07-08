@@ -10,13 +10,10 @@ struct TripCardView: View {
             coverImage
 
             VStack(alignment: .leading, spacing: 8) {
-                HStack(alignment: .top) {
-                    Text(trip.title)
-                        .font(.headline)
-                        .foregroundStyle(.primary)
-                    Spacer()
-                    StatusBadgeView(status: trip.status)
-                }
+
+                Text(trip.title)
+                    .font(.headline)
+                    .foregroundStyle(.primary)
 
                 if !trip.subtitle.isEmpty {
                     Text(trip.subtitle)
@@ -27,16 +24,7 @@ struct TripCardView: View {
 
                 HStack(spacing: 12) {
                     Label(formattedDate, systemImage: "calendar")
-
-                    if !trip.meetingTime.isEmpty {
-                        Label(formattedMeetingTime, systemImage: "clock")
-                    }
-                }
-                .font(.caption)
-                .foregroundStyle(.secondary)
-
-                HStack(spacing: 12) {
-                    Label("\(trip.currentParticipants)", systemImage: "person.2")
+                    Label("\(trip.applicationsCount)", systemImage: "car")
                     Label("\(trip.attractionsCount)", systemImage: "mappin")
 
                     if let km = trip.routeLengthKm {
@@ -68,25 +56,30 @@ struct TripCardView: View {
         }
         .frame(height: 200)
         .clipped()
-        .clipShape(UnevenRoundedRectangle(
-            topLeadingRadius: 12,
-            topTrailingRadius: 12
-        ))
+        .clipShape(
+            UnevenRoundedRectangle(
+                topLeadingRadius: 12,
+                topTrailingRadius: 12
+            )
+        )
     }
 
     private var photoURL: URL? {
-        horizontalSizeClass == .regular ? trip.mainPhoto?.url : trip.mainPhoto?.urlMobile
+        horizontalSizeClass == .regular
+            ? trip.mainPhoto?.url : trip.mainPhoto?.urlMobile
     }
 
     private var formattedDate: String {
-        let start = trip.startDate.formatted(.dateTime.day().month(.abbreviated).year())
-        guard let end = trip.endDate, !Calendar.current.isDate(end, inSameDayAs: trip.startDate) else {
+        let start = trip.startDate.formatted(
+            .dateTime.day().month(.abbreviated).year()
+        )
+        guard let end = trip.endDate,
+            !Calendar.current.isDate(end, inSameDayAs: trip.startDate)
+        else {
             return start
         }
-        return "\(start) – \(end.formatted(.dateTime.day().month(.abbreviated)))"
+        return
+            "\(start) – \(end.formatted(.dateTime.day().month(.abbreviated)))"
     }
 
-    private var formattedMeetingTime: String {
-        String(trip.meetingTime.prefix(5))
-    }
 }
