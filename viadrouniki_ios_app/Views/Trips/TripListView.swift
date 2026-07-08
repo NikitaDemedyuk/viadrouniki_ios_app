@@ -33,12 +33,9 @@ struct TripListView: View {
             LazyVStack(spacing: 16) {
                 ForEach(viewModel.trips) { trip in
                     TripCardView(trip: trip)
-                        .task { await viewModel.fetchMoreIfNeeded(currentTrip: trip) }
-                }
-
-                if viewModel.isLoading {
-                    ProgressView()
-                        .padding()
+                        .task {
+                            await viewModel.fetchMoreIfNeeded(currentTrip: trip)
+                        }
                 }
             }
             .padding()
