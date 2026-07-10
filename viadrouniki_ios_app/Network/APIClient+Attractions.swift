@@ -17,9 +17,10 @@ extension APIClient {
         if !search.isEmpty {
             queryItems.append(URLQueryItem(name: "search", value: search))
         }
-        let url = baseURL
-            .appending(path: "attractions")
-            .appending(queryItems: queryItems)
+        let url =
+            baseURL
+                .appending(path: "attractions")
+                .appending(queryItems: queryItems)
         return try await get(url: url)
     }
 
@@ -27,12 +28,13 @@ extension APIClient {
         locale: String = "ru",
         isActive: String = "active"
     ) async throws -> [PointMapItem] {
-        let url = baseURL
-            .appending(path: "attractions/map")
-            .appending(queryItems: [
-                URLQueryItem(name: "locale", value: locale),
-                URLQueryItem(name: "is_active", value: isActive),
-            ])
+        let url =
+            baseURL
+                .appending(path: "attractions/map")
+                .appending(queryItems: [
+                    URLQueryItem(name: "locale", value: locale),
+                    URLQueryItem(name: "is_active", value: isActive),
+                ])
         return try await get(url: url)
     }
 }

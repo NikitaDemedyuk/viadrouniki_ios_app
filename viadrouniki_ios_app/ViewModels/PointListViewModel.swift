@@ -41,7 +41,7 @@ final class PointListViewModel {
 
     func fetchMoreIfNeeded(currentPoint: Point) async {
         guard hasMorePages, !isFetchingMore, !isLoading,
-            points.last?.id == currentPoint.id
+              points.last?.id == currentPoint.id
         else { return }
 
         isFetchingMore = true

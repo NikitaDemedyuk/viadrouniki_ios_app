@@ -43,7 +43,9 @@ struct PointsView: View {
             } label: {
                 Image(systemName: displayMode == .list ? "map" : "list.bullet")
             }
-            .accessibilityLabel(displayMode == .list ? "Switch to map" : "Switch to list")
+            .accessibilityLabel(
+                displayMode == .list ? "Switch to map" : "Switch to list"
+            )
         }
     }
 
@@ -51,7 +53,7 @@ struct PointsView: View {
     private var content: some View {
         if displayMode == .map {
             mapView
-        } else if viewModel.isLoading && viewModel.points.isEmpty {
+        } else if viewModel.isLoading, viewModel.points.isEmpty {
             ProgressView()
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
         } else if let error = viewModel.errorMessage, viewModel.points.isEmpty {
