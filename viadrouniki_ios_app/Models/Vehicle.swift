@@ -7,12 +7,13 @@ struct Vehicle: Identifiable, Codable, Hashable {
     let model: String
     let year: Int
     let description: String?
-    let mainPhoto: TripPhoto?
+    let mainPhoto: VehiclePhoto?
+    let photos: [VehiclePhoto]?
     let user: VehicleOwner
     let photosCount: Int
     let tripsCount: Int
     let isActive: Bool
-    let schedule: String?
+    let schedule: VehicleSchedule?
     let canDelete: Bool
     let createdAt: Date
     let updatedAt: Date
@@ -21,6 +22,7 @@ struct Vehicle: Identifiable, Codable, Hashable {
         case id, brand, model, year, description, schedule
         case userId      = "user_id"
         case mainPhoto   = "main_photo"
+        case photos
         case user
         case photosCount = "photos_count"
         case tripsCount  = "trips_count"
@@ -28,6 +30,44 @@ struct Vehicle: Identifiable, Codable, Hashable {
         case canDelete   = "can_delete"
         case createdAt   = "created_at"
         case updatedAt   = "updated_at"
+    }
+}
+
+struct VehiclePhoto: Identifiable, Codable, Hashable {
+    let id: Int
+    let mediaId: Int?
+    let url: URL
+    let urlMobile: URL
+    let alt: String?
+    let isMain: Bool?
+    let sortOrder: Int?
+
+    enum CodingKeys: String, CodingKey {
+        case id, url, alt
+        case mediaId     = "media_id"
+        case urlMobile   = "url_mobile"
+        case isMain      = "is_main"
+        case sortOrder   = "sort_order"
+    }
+}
+
+enum VehicleSchedule: String, Codable {
+    case summer
+    case winter
+    case unknown
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        let raw = try container.decode(String.self)
+        self = VehicleSchedule(rawValue: raw) ?? .unknown
+    }
+
+    var label: String {
+        switch self {
+        case .summer: return "Summer"
+        case .winter: return "Winter"
+        case .unknown: return "Season"
+        }
     }
 }
 

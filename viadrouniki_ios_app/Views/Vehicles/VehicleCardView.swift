@@ -21,7 +21,7 @@ struct VehicleCardView: View {
                     Label("\(vehicle.tripsCount)", systemImage: "map")
                     Image(systemName: vehicle.scheduleIcon)
                         .foregroundStyle(vehicle.scheduleColor)
-                        .accessibilityLabel(vehicle.schedule?.capitalized ?? "Season")
+                        .accessibilityLabel(vehicle.schedule?.label ?? "Season")
                 }
                 .font(.caption)
                 .foregroundStyle(.secondary)
@@ -34,24 +34,20 @@ struct VehicleCardView: View {
     }
 
     private var coverImage: some View {
-        GeometryReader { geometry in
-            AsyncImage(url: photoURL) { image in
-                image
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-                    .frame(width: geometry.size.width, height: 200)
-                    .clipped()
-            } placeholder: {
-                Rectangle()
-                    .fill(Color(.systemGray5))
-                    .overlay(
-                        Image(systemName: "car")
-                            .foregroundStyle(.secondary)
-                    )
-                    .frame(width: geometry.size.width, height: 200)
-            }
+        AsyncImage(url: photoURL) { image in
+            image
+                .resizable()
+                .aspectRatio(contentMode: .fill)
+        } placeholder: {
+            Rectangle()
+                .fill(Color(.systemGray5))
+                .overlay(
+                    Image(systemName: "car")
+                        .foregroundStyle(.secondary)
+                )
         }
         .frame(height: 200)
+        .clipped()
         .clipShape(
             UnevenRoundedRectangle(
                 topLeadingRadius: 12,
@@ -67,18 +63,18 @@ struct VehicleCardView: View {
 }
 
 extension Vehicle {
-    fileprivate var scheduleIcon: String {
+    var scheduleIcon: String {
         switch schedule {
-        case "summer": return "sun.max.fill"
-        case "winter": return "snowflake"
+        case .summer: return "sun.max.fill"
+        case .winter: return "snowflake"
         default: return "calendar"
         }
     }
 
-    fileprivate var scheduleColor: Color {
+    var scheduleColor: Color {
         switch schedule {
-        case "summer": return .orange
-        case "winter": return .blue
+        case .summer: return .orange
+        case .winter: return .blue
         default: return .secondary
         }
     }
