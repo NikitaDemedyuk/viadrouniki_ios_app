@@ -34,20 +34,24 @@ struct VehicleCardView: View {
     }
 
     private var coverImage: some View {
-        AsyncImage(url: photoURL) { image in
-            image
-                .resizable()
-                .aspectRatio(contentMode: .fill)
-        } placeholder: {
-            Rectangle()
-                .fill(Color(.systemGray5))
-                .overlay(
-                    Image(systemName: "car")
-                        .foregroundStyle(.secondary)
-                )
+        GeometryReader { geometry in
+            AsyncImage(url: photoURL) { image in
+                image
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(width: geometry.size.width, height: 200)
+                    .clipped()
+            } placeholder: {
+                Rectangle()
+                    .fill(Color(.systemGray5))
+                    .overlay(
+                        Image(systemName: "car")
+                            .foregroundStyle(.secondary)
+                    )
+                    .frame(width: geometry.size.width, height: 200)
+            }
         }
         .frame(height: 200)
-        .clipped()
         .clipShape(
             UnevenRoundedRectangle(
                 topLeadingRadius: 12,
