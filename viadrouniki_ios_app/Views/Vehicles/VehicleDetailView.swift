@@ -52,11 +52,11 @@ struct VehicleDetailView: View {
 
     @ViewBuilder
     private var photoSection: some View {
-        if let photos = displayedVehicle.photos, !photos.isEmpty {
+        if let photos = displayedVehicle.photos, photos.count > 1 {
             let sorted = photos.sorted { ($0.isMain == true) && ($1.isMain != true) }
             galleryView(sorted)
         } else {
-            heroImage(url: photoURL(for: displayedVehicle.mainPhoto))
+            heroImage(url: photoURL(for: displayedVehicle.photos?.first ?? displayedVehicle.mainPhoto))
         }
     }
 

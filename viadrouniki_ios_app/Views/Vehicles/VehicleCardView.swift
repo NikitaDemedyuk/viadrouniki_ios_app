@@ -31,6 +31,7 @@ struct VehicleCardView: View {
         .background(.background)
         .clipShape(RoundedRectangle(cornerRadius: 12))
         .shadow(color: .black.opacity(0.08), radius: 8, x: 0, y: 2)
+        .contentShape(RoundedRectangle(cornerRadius: 12))
     }
 
     private var coverImage: some View {
