@@ -231,26 +231,3 @@ struct VehicleDetailView: View {
         .clipShape(RoundedRectangle(cornerRadius: 8))
     }
 }
-
-#Preview {
-    NavigationStack {
-        VehicleDetailView(vehicle: Vehicle(
-            id: 1,
-            userId: 1,
-            brand: "Toyota",
-            model: "Land Cruiser 200",
-            year: 2019,
-            description: "A reliable off-road vehicle used for many club expeditions across Belarus and beyond.",
-            mainPhoto: nil,
-            photos: nil,
-            user: VehicleOwner(id: 1, firstName: "Ivan", lastName: "Petrov", instagram: "ivan_travels", name: "Ivan Petrov", telegramUsername: nil),
-            photosCount: 42,
-            tripsCount: 17,
-            isActive: true,
-            schedule: .summer,
-            canDelete: false,
-            createdAt: .now,
-            updatedAt: .now
-        ))
-    }
-}
