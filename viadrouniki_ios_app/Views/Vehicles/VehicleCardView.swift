@@ -21,7 +21,7 @@ struct VehicleCardView: View {
                     Label("\(vehicle.tripsCount)", systemImage: "map")
                     Image(systemName: vehicle.scheduleIcon)
                         .foregroundStyle(vehicle.scheduleColor)
-                        .accessibilityLabel(vehicle.schedule?.label ?? "Season")
+                        .accessibilityLabel(vehicle.schedule.label)
                 }
                 .font(.caption)
                 .foregroundStyle(.secondary)
@@ -71,7 +71,7 @@ extension Vehicle {
         switch schedule {
         case .summer: return "sun.max.fill"
         case .winter: return "snowflake"
-        default: return "calendar"
+        case .unknown: return "calendar"
         }
     }
 
@@ -79,7 +79,7 @@ extension Vehicle {
         switch schedule {
         case .summer: return .orange
         case .winter: return .blue
-        default: return .secondary
+        case .unknown: return .secondary
         }
     }
 }

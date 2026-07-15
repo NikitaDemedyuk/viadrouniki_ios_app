@@ -139,7 +139,7 @@ struct VehicleDetailView: View {
             Label("\(displayedVehicle.photosCount) photos", systemImage: "photo")
             Image(systemName: displayedVehicle.scheduleIcon)
                 .foregroundStyle(displayedVehicle.scheduleColor)
-                .accessibilityLabel(displayedVehicle.schedule?.label ?? "Season")
+                .accessibilityLabel(displayedVehicle.schedule.label)
             Spacer()
         }
         .font(.subheadline)

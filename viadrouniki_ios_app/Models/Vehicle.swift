@@ -13,13 +13,52 @@ struct Vehicle: Identifiable, Codable, Hashable {
     let photosCount: Int
     let tripsCount: Int
     let isActive: Bool
-    let schedule: VehicleSchedule?
+    private let rawSchedule: VehicleSchedule?
     let canDelete: Bool
     let createdAt: Date
     let updatedAt: Date
 
+    var schedule: VehicleSchedule { rawSchedule ?? .unknown }
+
+    init(
+        id: Int,
+        userId: Int,
+        brand: String,
+        model: String,
+        year: Int,
+        description: String?,
+        mainPhoto: VehiclePhoto?,
+        photos: [VehiclePhoto]?,
+        user: VehicleOwner,
+        photosCount: Int,
+        tripsCount: Int,
+        isActive: Bool,
+        schedule: VehicleSchedule,
+        canDelete: Bool,
+        createdAt: Date,
+        updatedAt: Date
+    ) {
+        self.id = id
+        self.userId = userId
+        self.brand = brand
+        self.model = model
+        self.year = year
+        self.description = description
+        self.mainPhoto = mainPhoto
+        self.photos = photos
+        self.user = user
+        self.photosCount = photosCount
+        self.tripsCount = tripsCount
+        self.isActive = isActive
+        self.rawSchedule = schedule
+        self.canDelete = canDelete
+        self.createdAt = createdAt
+        self.updatedAt = updatedAt
+    }
+
     enum CodingKeys: String, CodingKey {
-        case id, brand, model, year, description, schedule
+        case id, brand, model, year, description
+        case rawSchedule = "schedule"
         case userId      = "user_id"
         case mainPhoto   = "main_photo"
         case photos
