@@ -92,7 +92,7 @@ struct TripOrganizer: Codable, Hashable {
     }
 }
 
-struct TripPhoto: Codable, Hashable {
+struct TripPhoto: Identifiable, Codable, Hashable {
     let id: Int
     let url: URL
     let urlMobile: URL
@@ -101,25 +101,5 @@ struct TripPhoto: Codable, Hashable {
     enum CodingKeys: String, CodingKey {
         case id, url, alt
         case urlMobile = "url_mobile"
-    }
-}
-
-
-struct PaginatedResponse<T: Codable>: Codable {
-    let data: [T]
-    let meta: PaginationMeta
-}
-
-struct PaginationMeta: Codable {
-    let currentPage: Int
-    let lastPage: Int
-    let perPage: Int
-    let total: Int
-
-    enum CodingKeys: String, CodingKey {
-        case currentPage = "current_page"
-        case lastPage    = "last_page"
-        case perPage     = "per_page"
-        case total
     }
 }

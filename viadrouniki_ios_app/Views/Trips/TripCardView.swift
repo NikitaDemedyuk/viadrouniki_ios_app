@@ -70,16 +70,16 @@ struct TripCardView: View {
     }
 
     private var formattedDate: String {
-        let start = trip.startDate.formatted(
-            .dateTime.day().month(.abbreviated).year()
-        )
         guard let end = trip.endDate,
             !Calendar.current.isDate(end, inSameDayAs: trip.startDate)
         else {
-            return start
+            return trip.startDate.formatted(.dateTime.day().month(.abbreviated).year())
         }
-        return
-            "\(start) – \(end.formatted(.dateTime.day().month(.abbreviated)))"
+        let sameYear = Calendar.current.isDate(trip.startDate, equalTo: end, toGranularity: .year)
+        let start = sameYear
+            ? trip.startDate.formatted(.dateTime.day().month(.abbreviated))
+            : trip.startDate.formatted(.dateTime.day().month(.abbreviated).year())
+        return "\(start) – \(end.formatted(.dateTime.day().month(.abbreviated).year()))"
     }
 
 }

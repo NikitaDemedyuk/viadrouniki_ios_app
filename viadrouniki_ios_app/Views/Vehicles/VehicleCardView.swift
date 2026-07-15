@@ -21,7 +21,7 @@ struct VehicleCardView: View {
                     Label("\(vehicle.tripsCount)", systemImage: "map")
                     Image(systemName: vehicle.scheduleIcon)
                         .foregroundStyle(vehicle.scheduleColor)
-                        .accessibilityLabel(vehicle.schedule?.capitalized ?? "Season")
+                        .accessibilityLabel(vehicle.schedule.label)
                 }
                 .font(.caption)
                 .foregroundStyle(.secondary)
@@ -31,6 +31,7 @@ struct VehicleCardView: View {
         .background(.background)
         .clipShape(RoundedRectangle(cornerRadius: 12))
         .shadow(color: .black.opacity(0.08), radius: 8, x: 0, y: 2)
+        .contentShape(RoundedRectangle(cornerRadius: 12))
     }
 
     private var coverImage: some View {
@@ -67,19 +68,19 @@ struct VehicleCardView: View {
 }
 
 extension Vehicle {
-    fileprivate var scheduleIcon: String {
+    var scheduleIcon: String {
         switch schedule {
-        case "summer": return "sun.max.fill"
-        case "winter": return "snowflake"
-        default: return "calendar"
+        case .summer: return "sun.max.fill"
+        case .winter: return "snowflake"
+        case .unknown: return "calendar"
         }
     }
 
-    fileprivate var scheduleColor: Color {
+    var scheduleColor: Color {
         switch schedule {
-        case "summer": return .orange
-        case "winter": return .blue
-        default: return .secondary
+        case .summer: return .orange
+        case .winter: return .blue
+        case .unknown: return .secondary
         }
     }
 }
