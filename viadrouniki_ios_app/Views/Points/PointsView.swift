@@ -9,6 +9,7 @@ private enum DisplayMode: String {
 struct PointsView: View {
     @State private var viewModel = PointListViewModel()
     @State private var displayMode: DisplayMode = .list
+    @State private var selectedMapPoint: PointMapItem?
 
     var body: some View {
         @Bindable var viewModel = viewModel
@@ -16,6 +17,9 @@ struct PointsView: View {
             if displayMode == .map {
                 content
                     .toolbar { displayModeButton }
+                    .navigationDestination(for: Point.self) { point in
+                        PointDetailView(point: point)
+                    }
             } else {
                 content
                     .navigationTitle("Points")
@@ -25,6 +29,9 @@ struct PointsView: View {
                     )
                     .toolbar { displayModeButton }
                     .refreshable { await viewModel.fetchInitial() }
+                    .navigationDestination(for: Point.self) { point in
+                        PointDetailView(point: point)
+                    }
             }
         }
         .task(id: viewModel.searchText) {
@@ -89,7 +96,8 @@ struct PointsView: View {
                         longitudeDelta: 5.0
                     )
                 )
-            )
+            ),
+            selection: $selectedMapPoint
         ) {
             ForEach(viewModel.mapPoints) { point in
                 if let lat = point.latitude, let lon = point.longitude {
@@ -100,11 +108,15 @@ struct PointsView: View {
                             longitude: lon
                         )
                     )
+                    .tag(point)
                 }
             }
         }
         .ignoresSafeArea(edges: .bottom)
         .task { await viewModel.fetchMapPoints() }
+        .navigationDestination(item: $selectedMapPoint) { mapPoint in
+            PointDetailView(point: Point(mapItem: mapPoint))
+        }
         .overlay(alignment: .bottomTrailing) {
             Button {
                 // TODO: open filter sheet
@@ -141,12 +153,15 @@ struct PointsView: View {
         ScrollView {
             LazyVStack(spacing: 16) {
                 ForEach(viewModel.points) { point in
-                    PointCardView(point: point)
-                        .task {
-                            await viewModel.fetchMoreIfNeeded(
-                                currentPoint: point
-                            )
-                        }
+                    NavigationLink(value: point) {
+                        PointCardView(point: point)
+                    }
+                    .buttonStyle(.plain)
+                    .task {
+                        await viewModel.fetchMoreIfNeeded(
+                            currentPoint: point
+                        )
+                    }
                 }
             }
             .padding()
