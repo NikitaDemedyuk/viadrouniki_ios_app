@@ -8,6 +8,9 @@ struct VehicleListView: View {
         NavigationStack {
             content
                 .navigationTitle("Vehicles")
+                .navigationDestination(for: Vehicle.self) { vehicle in
+                    VehicleDetailView(vehicle: vehicle)
+                }
                 .refreshable { await viewModel.fetchInitial() }
                 .toolbar {
                     ToolbarItem(placement: .topBarTrailing) {
@@ -59,8 +62,11 @@ struct VehicleListView: View {
         ScrollView {
             LazyVStack(spacing: 16) {
                 ForEach(viewModel.vehicles) { vehicle in
-                    VehicleCardView(vehicle: vehicle)
-                        .task { await viewModel.fetchMoreIfNeeded(currentVehicle: vehicle) }
+                    NavigationLink(value: vehicle) {
+                        VehicleCardView(vehicle: vehicle)
+                    }
+                    .buttonStyle(.plain)
+                    .task { await viewModel.fetchMoreIfNeeded(currentVehicle: vehicle) }
                 }
             }
             .padding()
