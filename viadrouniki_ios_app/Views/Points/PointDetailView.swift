@@ -43,7 +43,7 @@ struct PointDetailView: View {
                 .padding()
             }
         }
-        .navigationTitle(point.name)
+        .navigationTitle(displayedPoint.name)
         .navigationBarTitleDisplayMode(.inline)
         .task {
             async let fetchPoint: Void = viewModel.fetch(slug: point.slug)
