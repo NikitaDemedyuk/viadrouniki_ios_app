@@ -100,7 +100,9 @@ struct PointsView: View {
             selection: $selectedMapPoint
         ) {
             ForEach(viewModel.mapPoints) { point in
-                if let lat = point.latitude, let lon = point.longitude {
+                if let lat = point.latitude, let lon = point.longitude,
+                   let slug = point.slug, !slug.isEmpty
+                {
                     Marker(
                         point.name ?? "",
                         coordinate: CLLocationCoordinate2D(
