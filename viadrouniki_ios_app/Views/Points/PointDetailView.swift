@@ -189,7 +189,7 @@ struct PointDetailView: View {
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             } else {
-                VStack(spacing: 16) {
+                LazyVStack(spacing: 16) {
                     ForEach(viewModel.trips) { trip in
                         TripCardView(trip: trip)
                             .task {
