@@ -197,6 +197,12 @@ struct PointDetailView: View {
                             }
                     }
                 }
+
+                if let message = viewModel.tripsErrorMessage, let lastTrip = viewModel.trips.last {
+                    errorBanner(message: message) {
+                        await viewModel.fetchMoreTripsIfNeeded(currentTrip: lastTrip, slug: point.slug)
+                    }
+                }
             }
         }
     }

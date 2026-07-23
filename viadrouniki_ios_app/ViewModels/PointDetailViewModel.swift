@@ -49,6 +49,7 @@ final class PointDetailViewModel {
         else { return }
 
         isFetchingMoreTrips = true
+        tripsErrorMessage = nil
         let nextPage = currentTripsPage + 1
 
         do {
