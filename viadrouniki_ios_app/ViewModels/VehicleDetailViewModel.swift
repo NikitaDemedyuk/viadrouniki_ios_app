@@ -53,6 +53,7 @@ final class VehicleDetailViewModel {
 
         do {
             let response = try await APIClient.shared.fetchCarTrips(id: vehicleId, page: nextPage)
+            guard isFetchingMoreTrips else { return }
             trips.append(contentsOf: response.data)
             currentTripsPage = nextPage
             hasMoreTrips = response.meta.currentPage < response.meta.lastPage

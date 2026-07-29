@@ -29,6 +29,7 @@ final class PointDetailViewModel {
     }
 
     func fetchTrips(slug: String) async {
+        isFetchingMoreTrips = false
         guard !isLoadingTrips else { return }
         isLoadingTrips = true
         tripsErrorMessage = nil
@@ -54,6 +55,7 @@ final class PointDetailViewModel {
 
         do {
             let response = try await APIClient.shared.fetchAttractionTrips(slug: slug, page: nextPage)
+            guard isFetchingMoreTrips else { return }
             trips.append(contentsOf: response.data)
             currentTripsPage = nextPage
             hasMoreTrips = response.meta.currentPage < response.meta.lastPage
