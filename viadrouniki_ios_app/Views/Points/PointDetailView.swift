@@ -35,10 +35,8 @@ struct PointDetailView: View {
                         descriptionSection(description)
                     }
 
-                    if !viewModel.isLoadingTrips {
-                        Divider()
-                        tripsSection
-                    }
+                    Divider()
+                    tripsSection
                 }
                 .padding()
             }
@@ -136,7 +134,10 @@ struct PointDetailView: View {
             Text("Trips")
                 .font(.headline)
 
-            if let message = viewModel.tripsErrorMessage, viewModel.trips.isEmpty {
+            if viewModel.isLoadingTrips {
+                ProgressView()
+                    .frame(maxWidth: .infinity, alignment: .center)
+            } else if let message = viewModel.tripsErrorMessage, viewModel.trips.isEmpty {
                 ErrorBanner(message: message) {
                     await viewModel.fetchTrips(slug: point.slug)
                 }
