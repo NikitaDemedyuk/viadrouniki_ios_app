@@ -164,27 +164,3 @@ struct PointDetailView: View {
         }
     }
 }
-
-#Preview {
-    NavigationStack {
-        PointDetailView(
-            point: Point(
-                id: 20,
-                name: "Костёл святого Антония",
-                slug: "kostel-svyatogo-antoniya",
-                type: PointType(id: 2, name: "Костел", slug: "cathedral"),
-                address: "",
-                latitude: "53.88548330",
-                longitude: "28.60884870",
-                description: "Костел в Рованичах возведен в начале 19 века.",
-                mainPhoto: nil,
-                photos: nil,
-                tripsCount: 2,
-                photosCount: 1,
-                isActive: true,
-                createdAt: .now,
-                updatedAt: .now
-            )
-        )
-    }
-}
