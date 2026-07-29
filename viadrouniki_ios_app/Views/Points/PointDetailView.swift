@@ -60,7 +60,7 @@ struct PointDetailView: View {
             let sorted = photos.sorted { ($0.isMain == true) && ($1.isMain != true) }
             galleryView(sorted)
         } else {
-            heroImage(url: photoURL(for: displayedPoint.mainPhoto))
+            heroImage(url: heroPhotoURL)
         }
     }
 
@@ -114,7 +114,15 @@ struct PointDetailView: View {
             )
     }
 
+    private var heroPhotoURL: URL? {
+        photoURL(for: displayedPoint.mainPhoto) ?? photoURL(for: displayedPoint.photos?.first)
+    }
+
     private func photoURL(for photo: TripPhoto?) -> URL? {
+        horizontalSizeClass == .regular ? photo?.url : photo?.urlMobile
+    }
+
+    private func photoURL(for photo: PointPhoto?) -> URL? {
         horizontalSizeClass == .regular ? photo?.url : photo?.urlMobile
     }
 
