@@ -1,6 +1,37 @@
 import Foundation
 
 extension APIClient {
+    func fetchAttraction(
+        slug: String,
+        locale: String = "ru"
+    ) async throws -> Point {
+        let url =
+            baseURL
+                .appending(path: "attractions/slug/\(slug)")
+                .appending(queryItems: [
+                    URLQueryItem(name: "locale", value: locale),
+                ])
+        let response: SingleResponse<Point> = try await get(url: url)
+        return response.data
+    }
+
+    func fetchAttractionTrips(
+        slug: String,
+        page: Int = 1,
+        perPage: Int = 15,
+        locale: String = "ru"
+    ) async throws -> PaginatedResponse<Trip> {
+        let url =
+            baseURL
+                .appending(path: "attractions/slug/\(slug)/trips")
+                .appending(queryItems: [
+                    URLQueryItem(name: "per_page", value: "\(perPage)"),
+                    URLQueryItem(name: "locale", value: locale),
+                    URLQueryItem(name: "page", value: "\(page)"),
+                ])
+        return try await get(url: url)
+    }
+
     func fetchAttractions(
         page: Int,
         perPage: Int = 20,

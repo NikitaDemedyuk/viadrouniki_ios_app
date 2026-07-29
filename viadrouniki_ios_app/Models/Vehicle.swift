@@ -18,7 +18,9 @@ struct Vehicle: Identifiable, Codable, Hashable {
     let createdAt: Date
     let updatedAt: Date
 
-    var schedule: VehicleSchedule { rawSchedule ?? .unknown }
+    var schedule: VehicleSchedule {
+        rawSchedule ?? .unknown
+    }
 
     init(
         id: Int,
@@ -50,7 +52,7 @@ struct Vehicle: Identifiable, Codable, Hashable {
         self.photosCount = photosCount
         self.tripsCount = tripsCount
         self.isActive = isActive
-        self.rawSchedule = schedule
+        rawSchedule = schedule
         self.canDelete = canDelete
         self.createdAt = createdAt
         self.updatedAt = updatedAt
@@ -59,16 +61,16 @@ struct Vehicle: Identifiable, Codable, Hashable {
     enum CodingKeys: String, CodingKey {
         case id, brand, model, year, description
         case rawSchedule = "schedule"
-        case userId      = "user_id"
-        case mainPhoto   = "main_photo"
+        case userId = "user_id"
+        case mainPhoto = "main_photo"
         case photos
         case user
         case photosCount = "photos_count"
-        case tripsCount  = "trips_count"
-        case isActive    = "is_active"
-        case canDelete   = "can_delete"
-        case createdAt   = "created_at"
-        case updatedAt   = "updated_at"
+        case tripsCount = "trips_count"
+        case isActive = "is_active"
+        case canDelete = "can_delete"
+        case createdAt = "created_at"
+        case updatedAt = "updated_at"
     }
 }
 
@@ -83,12 +85,14 @@ struct VehiclePhoto: Identifiable, Codable, Hashable {
 
     enum CodingKeys: String, CodingKey {
         case id, url, alt
-        case mediaId     = "media_id"
-        case urlMobile   = "url_mobile"
-        case isMain      = "is_main"
-        case sortOrder   = "sort_order"
+        case mediaId = "media_id"
+        case urlMobile = "url_mobile"
+        case isMain = "is_main"
+        case sortOrder = "sort_order"
     }
 }
+
+extension VehiclePhoto: PhotoResource {}
 
 enum VehicleSchedule: String, Codable {
     case summer
@@ -120,8 +124,8 @@ struct VehicleOwner: Codable, Hashable {
 
     enum CodingKeys: String, CodingKey {
         case id, name, instagram
-        case firstName        = "first_name"
-        case lastName         = "last_name"
+        case firstName = "first_name"
+        case lastName = "last_name"
         case telegramUsername = "telegram_username"
     }
 }

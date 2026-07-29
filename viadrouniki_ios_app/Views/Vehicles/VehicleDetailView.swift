@@ -7,7 +7,9 @@ struct VehicleDetailView: View {
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @Environment(\.openURL) private var openURL
 
-    private var displayedVehicle: Vehicle { viewModel.vehicle ?? vehicle }
+    private var displayedVehicle: Vehicle {
+        viewModel.vehicle ?? vehicle
+    }
 
     var body: some View {
         ScrollView {
@@ -16,7 +18,7 @@ struct VehicleDetailView: View {
 
                 VStack(alignment: .leading, spacing: 20) {
                     if let message = viewModel.errorMessage, viewModel.vehicle == nil {
-                        errorBanner(message: message) {
+                        ErrorBannerView(message: message) {
                             await viewModel.fetch(id: vehicle.id)
                         }
                     }
@@ -50,64 +52,12 @@ struct VehicleDetailView: View {
 
     // MARK: - Photo section
 
-    @ViewBuilder
     private var photoSection: some View {
-        if let photos = displayedVehicle.photos, photos.count > 1 {
-            let sorted = photos.sorted { ($0.isMain == true) && ($1.isMain != true) }
-            galleryView(sorted)
-        } else {
-            heroImage(url: photoURL(for: displayedVehicle.photos?.first ?? displayedVehicle.mainPhoto))
-        }
-    }
-
-    private func galleryView(_ photos: [VehiclePhoto]) -> some View {
-        GeometryReader { geometry in
-            TabView {
-                ForEach(photos) { photo in
-                    let url = horizontalSizeClass == .regular ? photo.url : photo.urlMobile
-                    AsyncImage(url: url) { image in
-                        image
-                            .resizable()
-                            .aspectRatio(contentMode: .fill)
-                            .frame(width: geometry.size.width, height: 280)
-                            .clipped()
-                    } placeholder: {
-                        photoPlaceholder
-                            .frame(width: geometry.size.width, height: 280)
-                    }
-                }
-            }
-            .tabViewStyle(.page(indexDisplayMode: .automatic))
-            .indexViewStyle(.page(backgroundDisplayMode: .always))
-            .frame(width: geometry.size.width, height: 280)
-        }
-        .frame(height: 280)
-    }
-
-    private func heroImage(url: URL?) -> some View {
-        GeometryReader { geometry in
-            AsyncImage(url: url) { image in
-                image
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-                    .frame(width: geometry.size.width, height: 280)
-                    .clipped()
-            } placeholder: {
-                photoPlaceholder
-                    .frame(width: geometry.size.width, height: 280)
-            }
-        }
-        .frame(height: 280)
-    }
-
-    private var photoPlaceholder: some View {
-        Rectangle()
-            .fill(Color(.systemGray5))
-            .overlay(
-                Image(systemName: "car.fill")
-                    .font(.system(size: 48))
-                    .foregroundStyle(.secondary)
-            )
+        PhotoHeroView(
+            photos: displayedVehicle.photos,
+            heroURL: photoURL(for: displayedVehicle.photos?.first ?? displayedVehicle.mainPhoto),
+            placeholderSystemImage: "car.fill"
+        )
     }
 
     private func photoURL(for photo: VehiclePhoto?) -> URL? {
@@ -197,7 +147,7 @@ struct VehicleDetailView: View {
                 .font(.headline)
 
             if let message = viewModel.tripsErrorMessage, viewModel.trips.isEmpty {
-                errorBanner(message: message) {
+                ErrorBannerView(message: message) {
                     await viewModel.fetchTrips(vehicleId: vehicle.id)
                 }
             } else if viewModel.trips.isEmpty {
@@ -213,21 +163,5 @@ struct VehicleDetailView: View {
                 }
             }
         }
-    }
-
-    private func errorBanner(message: String, retry: @escaping () async -> Void) -> some View {
-        HStack {
-            Text(message)
-                .font(.footnote)
-                .foregroundStyle(.secondary)
-            Spacer()
-            Button("Retry") {
-                Task { await retry() }
-            }
-            .font(.footnote)
-        }
-        .padding(10)
-        .background(Color(.systemGray6))
-        .clipShape(RoundedRectangle(cornerRadius: 8))
     }
 }

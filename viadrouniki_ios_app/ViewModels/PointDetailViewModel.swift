@@ -3,8 +3,8 @@ import Observation
 
 @Observable
 @MainActor
-final class VehicleDetailViewModel {
-    var vehicle: Vehicle?
+final class PointDetailViewModel {
+    var point: Point?
     var isLoading = false
     var errorMessage: String?
 
@@ -16,24 +16,25 @@ final class VehicleDetailViewModel {
     private var hasMoreTrips = true
     private var isFetchingMoreTrips = false
 
-    func fetch(id: Int) async {
+    func fetch(slug: String) async {
         guard !isLoading else { return }
         isLoading = true
         errorMessage = nil
         do {
-            vehicle = try await APIClient.shared.fetchCar(id: id)
+            point = try await APIClient.shared.fetchAttraction(slug: slug)
         } catch {
             errorMessage = error.localizedDescription
         }
         isLoading = false
     }
 
-    func fetchTrips(vehicleId: Int) async {
+    func fetchTrips(slug: String) async {
+        isFetchingMoreTrips = false
         guard !isLoadingTrips else { return }
         isLoadingTrips = true
         tripsErrorMessage = nil
         do {
-            let response = try await APIClient.shared.fetchCarTrips(id: vehicleId, page: 1)
+            let response = try await APIClient.shared.fetchAttractionTrips(slug: slug, page: 1)
             trips = response.data
             currentTripsPage = 1
             hasMoreTrips = response.meta.currentPage < response.meta.lastPage
@@ -43,16 +44,17 @@ final class VehicleDetailViewModel {
         isLoadingTrips = false
     }
 
-    func fetchMoreTripsIfNeeded(currentTrip: Trip, vehicleId: Int) async {
+    func fetchMoreTripsIfNeeded(currentTrip: Trip, slug: String) async {
         guard hasMoreTrips, !isFetchingMoreTrips, !isLoadingTrips,
-            trips.last?.id == currentTrip.id
+              trips.last?.id == currentTrip.id
         else { return }
 
         isFetchingMoreTrips = true
+        tripsErrorMessage = nil
         let nextPage = currentTripsPage + 1
 
         do {
-            let response = try await APIClient.shared.fetchCarTrips(id: vehicleId, page: nextPage)
+            let response = try await APIClient.shared.fetchAttractionTrips(slug: slug, page: nextPage)
             guard isFetchingMoreTrips else { return }
             trips.append(contentsOf: response.data)
             currentTripsPage = nextPage
