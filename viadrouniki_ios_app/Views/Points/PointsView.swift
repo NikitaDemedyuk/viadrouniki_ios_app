@@ -14,24 +14,23 @@ struct PointsView: View {
     var body: some View {
         @Bindable var viewModel = viewModel
         NavigationStack {
-            if displayMode == .map {
-                content
-                    .toolbar { displayModeButton }
-                    .navigationDestination(for: Point.self) { point in
-                        PointDetailView(point: point)
-                    }
-            } else {
-                content
-                    .navigationTitle("Points")
-                    .searchable(
-                        text: $viewModel.searchText,
-                        prompt: "Search points"
-                    )
-                    .toolbar { displayModeButton }
-                    .refreshable { await viewModel.fetchInitial() }
-                    .navigationDestination(for: Point.self) { point in
-                        PointDetailView(point: point)
-                    }
+            Group {
+                if displayMode == .map {
+                    content
+                        .toolbar { displayModeButton }
+                } else {
+                    content
+                        .navigationTitle("Points")
+                        .searchable(
+                            text: $viewModel.searchText,
+                            prompt: "Search points"
+                        )
+                        .toolbar { displayModeButton }
+                        .refreshable { await viewModel.fetchInitial() }
+                }
+            }
+            .navigationDestination(for: Point.self) { point in
+                PointDetailView(point: point)
             }
         }
         .task(id: viewModel.searchText) {
