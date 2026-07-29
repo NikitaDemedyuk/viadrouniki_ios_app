@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct ErrorBanner: View {
+struct ErrorBannerView: View {
     let message: String
     let retry: () async -> Void
 

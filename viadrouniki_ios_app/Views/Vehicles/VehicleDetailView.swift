@@ -18,7 +18,7 @@ struct VehicleDetailView: View {
 
                 VStack(alignment: .leading, spacing: 20) {
                     if let message = viewModel.errorMessage, viewModel.vehicle == nil {
-                        ErrorBanner(message: message) {
+                        ErrorBannerView(message: message) {
                             await viewModel.fetch(id: vehicle.id)
                         }
                     }
@@ -147,7 +147,7 @@ struct VehicleDetailView: View {
                 .font(.headline)
 
             if let message = viewModel.tripsErrorMessage, viewModel.trips.isEmpty {
-                ErrorBanner(message: message) {
+                ErrorBannerView(message: message) {
                     await viewModel.fetchTrips(vehicleId: vehicle.id)
                 }
             } else if viewModel.trips.isEmpty {

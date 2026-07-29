@@ -17,7 +17,7 @@ struct PointDetailView: View {
 
                 VStack(alignment: .leading, spacing: 20) {
                     if let message = viewModel.errorMessage, viewModel.point == nil {
-                        ErrorBanner(message: message) {
+                        ErrorBannerView(message: message) {
                             await viewModel.fetch(slug: point.slug)
                         }
                     }
@@ -138,7 +138,7 @@ struct PointDetailView: View {
                 ProgressView()
                     .frame(maxWidth: .infinity, alignment: .center)
             } else if let message = viewModel.tripsErrorMessage, viewModel.trips.isEmpty {
-                ErrorBanner(message: message) {
+                ErrorBannerView(message: message) {
                     await viewModel.fetchTrips(slug: point.slug)
                 }
             } else if viewModel.trips.isEmpty {
@@ -156,7 +156,7 @@ struct PointDetailView: View {
                 }
 
                 if let message = viewModel.tripsErrorMessage, let lastTrip = viewModel.trips.last {
-                    ErrorBanner(message: message) {
+                    ErrorBannerView(message: message) {
                         await viewModel.fetchMoreTripsIfNeeded(currentTrip: lastTrip, slug: point.slug)
                     }
                 }
