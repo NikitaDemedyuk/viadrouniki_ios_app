@@ -17,7 +17,7 @@ struct PointDetailView: View {
 
                 VStack(alignment: .leading, spacing: 20) {
                     if let message = viewModel.errorMessage, viewModel.point == nil {
-                        errorBanner(message: message) {
+                        ErrorBanner(message: message) {
                             await viewModel.fetch(slug: point.slug)
                         }
                     }
@@ -54,64 +54,12 @@ struct PointDetailView: View {
 
     // MARK: - Photo section
 
-    @ViewBuilder
     private var photoSection: some View {
-        if let photos = displayedPoint.photos, photos.count > 1 {
-            let sorted = photos.sorted { ($0.isMain == true) && ($1.isMain != true) }
-            galleryView(sorted)
-        } else {
-            heroImage(url: heroPhotoURL)
-        }
-    }
-
-    private func galleryView(_ photos: [PointPhoto]) -> some View {
-        GeometryReader { geometry in
-            TabView {
-                ForEach(photos) { photo in
-                    let url = horizontalSizeClass == .regular ? photo.url : photo.urlMobile
-                    AsyncImage(url: url) { image in
-                        image
-                            .resizable()
-                            .aspectRatio(contentMode: .fill)
-                            .frame(width: geometry.size.width, height: 280)
-                            .clipped()
-                    } placeholder: {
-                        photoPlaceholder
-                            .frame(width: geometry.size.width, height: 280)
-                    }
-                }
-            }
-            .tabViewStyle(.page(indexDisplayMode: .automatic))
-            .indexViewStyle(.page(backgroundDisplayMode: .always))
-            .frame(width: geometry.size.width, height: 280)
-        }
-        .frame(height: 280)
-    }
-
-    private func heroImage(url: URL?) -> some View {
-        GeometryReader { geometry in
-            AsyncImage(url: url) { image in
-                image
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-                    .frame(width: geometry.size.width, height: 280)
-                    .clipped()
-            } placeholder: {
-                photoPlaceholder
-                    .frame(width: geometry.size.width, height: 280)
-            }
-        }
-        .frame(height: 280)
-    }
-
-    private var photoPlaceholder: some View {
-        Rectangle()
-            .fill(Color(.systemGray5))
-            .overlay(
-                Image(systemName: "mappin.circle")
-                    .font(.system(size: 48))
-                    .foregroundStyle(.secondary)
-            )
+        PhotoHeroView(
+            photos: displayedPoint.photos,
+            heroURL: heroPhotoURL,
+            placeholderSystemImage: "mappin.circle"
+        )
     }
 
     private var heroPhotoURL: URL? {
@@ -189,7 +137,7 @@ struct PointDetailView: View {
                 .font(.headline)
 
             if let message = viewModel.tripsErrorMessage, viewModel.trips.isEmpty {
-                errorBanner(message: message) {
+                ErrorBanner(message: message) {
                     await viewModel.fetchTrips(slug: point.slug)
                 }
             } else if viewModel.trips.isEmpty {
@@ -207,28 +155,12 @@ struct PointDetailView: View {
                 }
 
                 if let message = viewModel.tripsErrorMessage, let lastTrip = viewModel.trips.last {
-                    errorBanner(message: message) {
+                    ErrorBanner(message: message) {
                         await viewModel.fetchMoreTripsIfNeeded(currentTrip: lastTrip, slug: point.slug)
                     }
                 }
             }
         }
-    }
-
-    private func errorBanner(message: String, retry: @escaping () async -> Void) -> some View {
-        HStack {
-            Text(message)
-                .font(.footnote)
-                .foregroundStyle(.secondary)
-            Spacer()
-            Button("Retry") {
-                Task { await retry() }
-            }
-            .font(.footnote)
-        }
-        .padding(10)
-        .background(Color(.systemGray6))
-        .clipShape(RoundedRectangle(cornerRadius: 8))
     }
 }
 

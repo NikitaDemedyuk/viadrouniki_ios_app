@@ -46,6 +46,8 @@ struct PointPhoto: Identifiable, Codable, Hashable {
     }
 }
 
+extension PointPhoto: PhotoResource {}
+
 struct PointType: Codable, Hashable {
     let id: Int
     let name: String
