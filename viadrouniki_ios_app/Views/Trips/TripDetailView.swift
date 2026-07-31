@@ -147,15 +147,15 @@ struct TripDetailView: View {
                 .font(.headline)
 
             VStack(spacing: 0) {
-                ForEach(sortedAttractions) { attraction in
+                ForEach(Array(sortedAttractions.enumerated()), id: \.element.id) { index, attraction in
                     NavigationLink {
                         PointDetailView(point: Point(attraction: attraction))
                     } label: {
-                        attractionRow(attraction)
+                        attractionRow(attraction, position: index + 1)
                     }
                     .buttonStyle(.plain)
 
-                    if attraction.id != sortedAttractions.last?.id {
+                    if index < sortedAttractions.count - 1 {
                         Divider()
                             .padding(.leading, 48)
                     }
@@ -165,9 +165,9 @@ struct TripDetailView: View {
         }
     }
 
-    private func attractionRow(_ attraction: TripAttraction) -> some View {
+    private func attractionRow(_ attraction: TripAttraction, position: Int) -> some View {
         HStack(spacing: 12) {
-            Text("\(attraction.sortOrder + 1)")
+            Text("\(position)")
                 .font(.caption.monospacedDigit().bold())
                 .foregroundStyle(.secondary)
                 .frame(width: 22, height: 22)
