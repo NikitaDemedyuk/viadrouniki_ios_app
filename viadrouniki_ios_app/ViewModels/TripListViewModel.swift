@@ -23,7 +23,7 @@ final class TripListViewModel {
             currentPage = 1
             hasMorePages = response.meta.currentPage < response.meta.lastPage
         } catch {
-            errorMessage = error.localizedDescription
+            errorMessage = error.presentableMessage
         }
 
         isLoading = false
@@ -43,7 +43,7 @@ final class TripListViewModel {
             currentPage = nextPage
             hasMorePages = response.meta.currentPage < response.meta.lastPage
         } catch {
-            errorMessage = error.localizedDescription
+            errorMessage = error.presentableMessage
         }
 
         isFetchingMore = false

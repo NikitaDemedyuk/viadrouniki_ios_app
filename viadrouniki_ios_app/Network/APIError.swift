@@ -15,3 +15,16 @@ enum APIError: Error, LocalizedError {
         }
     }
 }
+
+extension Error {
+    /// The message to show the user, or `nil` when there is nothing worth
+    /// showing.
+    ///
+    /// SwiftUI cancels a `.task` when its view goes away, which surfaces here
+    /// as `APIError.networkError(URLError(.cancelled))` — noise, not a failure
+    /// the user should read. The cancellation arrives wrapped, so `catch is
+    /// CancellationError` won't match it; ask the task instead.
+    var presentableMessage: String? {
+        Task.isCancelled ? nil : localizedDescription
+    }
+}

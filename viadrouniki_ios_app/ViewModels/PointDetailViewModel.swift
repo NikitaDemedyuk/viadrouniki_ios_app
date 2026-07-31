@@ -23,7 +23,7 @@ final class PointDetailViewModel {
         do {
             point = try await APIClient.shared.fetchAttraction(slug: slug)
         } catch {
-            errorMessage = error.localizedDescription
+            errorMessage = error.presentableMessage
         }
         isLoading = false
     }
@@ -39,7 +39,7 @@ final class PointDetailViewModel {
             currentTripsPage = 1
             hasMoreTrips = response.meta.currentPage < response.meta.lastPage
         } catch {
-            tripsErrorMessage = error.localizedDescription
+            tripsErrorMessage = error.presentableMessage
         }
         isLoadingTrips = false
     }
@@ -60,7 +60,7 @@ final class PointDetailViewModel {
             currentTripsPage = nextPage
             hasMoreTrips = response.meta.currentPage < response.meta.lastPage
         } catch {
-            tripsErrorMessage = error.localizedDescription
+            tripsErrorMessage = error.presentableMessage
         }
 
         isFetchingMoreTrips = false

@@ -19,7 +19,7 @@ final class TripDetailViewModel {
         do {
             trip = try await APIClient.shared.fetchTrip(slug: slug)
         } catch {
-            errorMessage = error.localizedDescription
+            errorMessage = error.presentableMessage
         }
         isLoading = false
     }
@@ -31,7 +31,7 @@ final class TripDetailViewModel {
         do {
             cars = try await APIClient.shared.fetchTripCars(id: tripId)
         } catch {
-            carsErrorMessage = error.localizedDescription
+            carsErrorMessage = error.presentableMessage
         }
         isLoadingCars = false
     }
