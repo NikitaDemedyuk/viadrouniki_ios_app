@@ -30,17 +30,21 @@ struct Trip: Identifiable, Codable, Hashable {
     let mainPhoto: TripPhoto?
     let photos: [TripPhoto]?
     let attractions: [TripAttraction]?
-    let externalLinks: ExternalLinkList
+    private let rawExternalLinks: ExternalLinkList?
     let isActive: Bool
     let canAcceptApplications: Bool
     let canSubmitApplication: Bool
     let createdAt: Date
     let updatedAt: Date
 
+    var externalLinks: [ExternalLink] {
+        rawExternalLinks?.items ?? []
+    }
+
     enum CodingKeys: String, CodingKey {
         case id, title, subtitle, number, slug, status, rating, photos, attractions
         case tripDescription        = "description"
-        case externalLinks          = "external_links"
+        case rawExternalLinks       = "external_links"
         case routeLengthKm          = "route_length_km"
         case startDate              = "start_date"
         case endDate                = "end_date"
@@ -121,13 +125,14 @@ struct ExternalLink: Codable, Hashable {
     let label: String
 }
 
-/// The API encodes `external_links` inconsistently: `[]`, `[{"url","label"}]`,
-/// or a `{"map": "...", "link": "..."}` object with plain URL strings. This
-/// normalizes all three shapes to `[ExternalLink]` instead of throwing.
+/// Decoding adapter for `external_links`, which the API encodes inconsistently:
+/// `[]`, `[{"url","label"}]`, or a `{"map": "...", "link": "..."}` object with
+/// plain URL strings. This normalizes all three shapes instead of throwing.
+///
+/// Always held as an optional so a missing key can't fail the whole model —
+/// read it through the owning type's `externalLinks` property, never directly.
 struct ExternalLinkList: Codable, Hashable {
     let items: [ExternalLink]
-
-    var isEmpty: Bool { items.isEmpty }
 
     init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
@@ -155,7 +160,7 @@ struct TripAttraction: Identifiable, Codable, Hashable {
     let slug: String
     let address: String
     let attractionDescription: String
-    let externalLinks: ExternalLinkList
+    private let rawExternalLinks: ExternalLinkList?
     let latitude: Double?
     let longitude: Double?
     let visitedAt: Date?
@@ -164,11 +169,15 @@ struct TripAttraction: Identifiable, Codable, Hashable {
     let tripsCount: Int
     let type: AttractionType?
 
+    var externalLinks: [ExternalLink] {
+        rawExternalLinks?.items ?? []
+    }
+
     enum CodingKeys: String, CodingKey {
         case id, name, slug, address, latitude, longitude, visited, type
         case tripAttractionId     = "trip_attraction_id"
         case attractionDescription = "description"
-        case externalLinks        = "external_links"
+        case rawExternalLinks     = "external_links"
         case visitedAt            = "visited_at"
         case sortOrder            = "sort_order"
         case tripsCount           = "trips_count"
