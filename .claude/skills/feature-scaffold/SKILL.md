@@ -5,19 +5,33 @@ description: Scaffold a new list-based feature (Model → APIClient extension �
 
 # Feature scaffold — viadrouniki_ios_app
 
-Every existing feature (Trips, Points, Vehicles) is the same 4-file vertical slice:
+Project invariants (layout, build settings, shared types, naming) are in `CLAUDE.md` at the
+repo root. This skill covers the procedure only.
+
+Every existing feature (Trips, Points, Vehicles) is the same 5-file vertical slice:
 
 ```
 Models/<Domain>.swift                        struct, Codable, CodingKeys
-Network/APIClient+<Domain>s.swift             extension APIClient { func fetch<Domain>s(...) }
+Network/APIClient+<APIDomain>.swift           extension APIClient { func fetch<Domain>s(...) }
 ViewModels/<Domain>ListViewModel.swift        @Observable @MainActor final class
 Views/<Domain>s/<Domain>ListView.swift        ScrollView + LazyVStack + pagination
 Views/<Domain>s/<Domain>CardView.swift        row/card shown in the list
 ```
 
-Read `references/templates.md` before writing anything — it has the exact code templates with the project's real conventions, including one **intentional deviation** from what you'll see in `TripCardView.swift`/`VehicleCardView.swift` on `develop` (explained there). Don't pattern-match those two files directly for the cover-image code; use the template.
+`<APIDomain>` is the **API's** resource name, which may differ from the model name — the
+`Point` model is served by `APIClient+Attractions.swift`, `Vehicle` by `APIClient+Cars.swift`.
+Ask which name the endpoint uses if it isn't obvious from the path; don't assume one
+placeholder works across all five files.
 
-The Xcode project uses `PBXFileSystemSynchronizedRootGroup` — new files placed in the right folder are picked up automatically. No manual project-file editing needed, just build to verify (`xcodebuild -scheme viadrouniki_ios_app -destination 'generic/platform=iOS Simulator' build`).
+Read `references/templates.md` before writing anything — it has the exact code templates with
+the project's real conventions.
+
+New files placed in the right folder are picked up automatically (the project uses
+`PBXFileSystemSynchronizedRootGroup`), so there's no project-file editing — just build:
+
+```bash
+xcodebuild -scheme viadrouniki_ios_app -destination 'generic/platform=iOS Simulator' build
+```
 
 ## Before generating anything, gather:
 
@@ -31,16 +45,16 @@ Do not invent an endpoint shape from nothing. If the user hasn't given you field
 
 ## Generation steps
 
-1. **Model** (`Models/<Domain>.swift`): struct conforming to `Identifiable, Codable, Hashable`. `CodingKeys` mapping every snake_case JSON field to camelCase. If there's a pagination wrapper needed, **do not redeclare `PaginatedResponse`/`PaginationMeta`** — they already exist at the top level (currently declared in `Models/Trip.swift`, used module-wide by Points and Vehicles too). Just return `PaginatedResponse<Domain>` from the fetch function.
-2. **Network** (`Network/APIClient+<Domain>s.swift`): one `extension APIClient` with a `fetch<Domain>s(page:perPage:sortOrder:locale:)` async throws function, matching the query-param and `locale: String = "ru"` pattern in `APIClient+Trips.swift`/`APIClient+Cars.swift`. Reuse `SortOrder` (declared in `APIClient+Trips.swift`) instead of redeclaring it.
+1. **Model** (`Models/<Domain>.swift`): struct conforming to `Identifiable, Codable, Hashable`. `CodingKeys` mapping every snake_case JSON field to camelCase. **Do not redeclare `PaginatedResponse`/`PaginationMeta`/`SingleResponse`** — all three already exist in `Models/APIResponse.swift` and are used module-wide. Just return `PaginatedResponse<Domain>` from the fetch function. If the domain has photos, conform its photo struct to `PhotoResource` (see step 4).
+2. **Network** (`Network/APIClient+<APIDomain>.swift`): one `extension APIClient` with a `fetch<Domain>s(page:perPage:sortOrder:locale:)` async throws function, matching the query-param and `locale: String = "ru"` pattern in `APIClient+Trips.swift`/`APIClient+Cars.swift`. Reuse `SortOrder` (declared in `APIClient+Trips.swift`) instead of redeclaring it.
 3. **ViewModel** (`ViewModels/<Domain>ListViewModel.swift`): `@Observable @MainActor final class` with `fetchInitial()` / `fetchMoreIfNeeded(current:)` following the exact guard-and-pagination-state pattern in `TripListViewModel.swift` (see template — the guard conditions and `isFetchingMore` flag matter, don't simplify them away).
-4. **Views**: `<Domain>ListView.swift` (loading/error/content states, `.refreshable`, `ScrollView` + `LazyVStack`) and `<Domain>CardView.swift` (card layout — use the template's `coverImage`, not a copy of `TripCardView`'s).
+4. **Views**: `<Domain>ListView.swift` (loading/error/content states, `.refreshable`, `ScrollView` + `LazyVStack`) and `<Domain>CardView.swift`. For the cover image, copy `VehicleCardView.swift` — it has the `GeometryReader` width fix that `TripCardView.swift` still lacks (see the template's note). If the feature later needs a full-bleed hero image (detail screens), use the existing generic `PhotoHeroView<Photo: PhotoResource>` rather than writing a new one.
 5. **Build** to confirm it compiles before telling the user it's done.
 6. **Tell the user, don't do it yourself**: wiring the new `<Domain>ListView` into `App/ContentView.swift`'s `TabView` is a product decision (tab order, icon, whether it needs auth-gating like the Profile/Login tab does) — surface the snippet to add and let them place it, rather than editing `ContentView.swift` unprompted.
 
 ## What NOT to do
 
 - Don't add a detail view, search, or map view unless asked — Trips and Points shipped for a long time as list-only.
-- Don't introduce a new `Service` protocol/DI layer — every existing feature calls `APIClient.shared` directly from the ViewModel. That's a known architecture inconsistency (flagged in past reviews) but scaffolding a new pattern for one feature would make the codebase less consistent, not more. Match what's there.
-- Don't add unit tests unless asked — there is no test target in this project yet.
+- Don't introduce a `Service` protocol/DI layer — every existing feature calls `APIClient.shared` directly from the ViewModel. This is the accepted convention, documented in `CLAUDE.md`; scaffolding a different pattern for one feature would make the codebase less consistent, not more. Match what's there.
+- Don't add unit tests. There is no test target in this project — test files would compile into nothing.
 - Don't guess the icon/SF Symbol for the tab — ask, or leave a `TODO` placeholder in the snippet you hand back for `ContentView.swift`.

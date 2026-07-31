@@ -94,16 +94,9 @@ func fetch<Domain>Map(
 }
 ```
 
-## Single resource by id
+## Single resource by id (`fetchCar(id:)`)
 
-Not present on `develop` as of this writing — this existed on `feature/vehicle-page`. Check `Models/APIResponse.swift` or the top of `Models/Trip.swift` for `SingleResponse<T>` before adding it again:
-
-```swift
-// Only add this if it doesn't already exist somewhere in Models/:
-struct SingleResponse<T: Codable>: Codable {
-    let data: T
-}
-```
+`SingleResponse<T>` is declared in `Models/APIResponse.swift` — reuse it, do not redeclare it:
 
 ```swift
 func fetch<Domain>(id: Int) async throws -> <Domain> {

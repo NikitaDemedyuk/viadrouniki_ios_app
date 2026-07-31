@@ -26,21 +26,29 @@ struct <Domain>: Identifiable, Codable, Hashable {
     }
 }
 
-struct <Domain>Photo: Codable, Hashable {
+struct <Domain>Photo: Identifiable, Codable, Hashable {
     let id: Int
     let url: URL
     let urlMobile: URL
     let alt: String?
+    let isMain: Bool?
 
     enum CodingKeys: String, CodingKey {
         case id, url, alt
         case urlMobile = "url_mobile"
+        case isMain = "is_main"
     }
 }
+
+// Opts the photo type into the shared PhotoResource abstraction, which is what
+// PhotoHeroView (and any future shared photo view) is generic over. PointPhoto
+// and VehiclePhoto both do this — match them.
+extension <Domain>Photo: PhotoResource {}
 ```
 
 Notes:
-- `PaginatedResponse<T>` / `PaginationMeta` already exist (declared in `Trip.swift`) — do not redeclare them here.
+- `PaginatedResponse<T>` / `PaginationMeta` / `SingleResponse<T>` already exist in `Models/APIResponse.swift` — do not redeclare them here.
+- `PhotoResource` requires `url`, `urlMobile`, and `isMain`. If the API doesn't return `is_main` for this domain, keep the property as `Bool?` and let it decode to `nil` rather than dropping the conformance.
 - If the domain doesn't have a photo, drop `<Domain>Photo` and the `mainPhoto` field, and skip `coverImage` in the CardView template below entirely (don't render a placeholder for a field that doesn't exist).
 - Only include an enum-with-fallback (like `TripStatus`/`VehicleSchedule`) if the API actually has a status/category-style string field. Don't add one speculatively.
 
@@ -219,14 +227,16 @@ struct <Domain>CardView: View {
         .contentShape(RoundedRectangle(cornerRadius: 12))
     }
 
-    // IMPORTANT: this uses GeometryReader with an explicit width, unlike
-    // TripCardView/the pre-fix VehicleCardView on develop. AsyncImage +
-    // .aspectRatio(contentMode: .fill) with only a fixed height (no width)
-    // can report an ideal width *larger* than the available column for
-    // wide/panoramic photos, pushing the whole card wider than the screen
-    // and silently eating its horizontal padding. Confirmed as a real bug
-    // in this app (see feature/vehicle-page history) — don't "simplify"
-    // this back to a plain `.frame(height: 200)`.
+    // IMPORTANT: GeometryReader with an explicit width is load-bearing.
+    // AsyncImage + .aspectRatio(contentMode: .fill) with only a fixed height
+    // (no width) can report an ideal width *larger* than the available column
+    // for wide/panoramic photos, pushing the whole card wider than the screen
+    // and silently eating its horizontal padding. Confirmed as a real bug in
+    // this app — don't "simplify" this back to a plain `.frame(height: 200)`.
+    //
+    // VehicleCardView.swift on develop already has this fix and is a good
+    // reference. TripCardView.swift does NOT — it still has the original bug,
+    // so don't copy that one.
     private var coverImage: some View {
         GeometryReader { geometry in
             AsyncImage(url: photoURL) { image in
@@ -271,4 +281,12 @@ If the model has no photo field, delete `coverImage` and `photoURL` entirely and
     .tag(TODO_next_available_tag)
 ```
 
-`App/ContentView.swift`'s `TabView` currently has tags 0–3 (Trips, Points, Vehicles, Profile/Login). Ask the user where the new tab should go and what SF Symbol fits, rather than guessing.
+`App/ContentView.swift`'s `TabView` currently has tags 0–3 (Trips, Points, Vehicles, and
+Profile/Login sharing tag 3 behind an `isLoggedIn` check). Tab selection is bound to
+`AppViewModel.selectedTab`, so a new tab needs a tag that doesn't collide. Ask the user where
+the tab should go and what SF Symbol fits, rather than guessing.
+
+The snippet above uses `.tabItem`/`.tag` to match the existing file. The deployment target
+(iOS 26.5) supports the newer `Tab("Trips", systemImage:, value:)` builder, but mixing the two
+styles in one `TabView` is worse than either — migrating `ContentView` wholesale is its own
+task. Don't half-convert it while adding a feature.
