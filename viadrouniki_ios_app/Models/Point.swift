@@ -89,7 +89,7 @@ extension Point {
     }
 
     init(attraction: TripAttraction) {
-        id = attraction.id
+        id = attraction.attractionId
         name = attraction.name
         slug = attraction.slug
         if let attractionType = attraction.type {

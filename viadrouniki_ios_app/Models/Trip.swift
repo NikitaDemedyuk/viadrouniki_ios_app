@@ -154,8 +154,12 @@ struct ExternalLinkList: Codable, Hashable {
 }
 
 struct TripAttraction: Identifiable, Codable, Hashable {
-    let tripAttractionId: Int
+    /// Identity is the trip-attraction row, not the attraction: a route may
+    /// visit the same place twice, which would give two rows the same
+    /// `attractionId`. Use `attractionId` when addressing the attraction
+    /// itself (e.g. building a `Point`), never as a list identity.
     let id: Int
+    let attractionId: Int
     let name: String
     let slug: String
     let address: String
@@ -174,8 +178,9 @@ struct TripAttraction: Identifiable, Codable, Hashable {
     }
 
     enum CodingKeys: String, CodingKey {
-        case id, name, slug, address, latitude, longitude, visited, type
-        case tripAttractionId     = "trip_attraction_id"
+        case name, slug, address, latitude, longitude, visited, type
+        case id                   = "trip_attraction_id"
+        case attractionId         = "id"
         case attractionDescription = "description"
         case rawExternalLinks     = "external_links"
         case visitedAt            = "visited_at"
