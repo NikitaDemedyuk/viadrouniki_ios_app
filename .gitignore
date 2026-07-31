@@ -22,3 +22,6 @@ Podfile.lock
 # macOS
 .DS_Store
 *.swp
+
+# Claude
+.claude/settings.local.json
