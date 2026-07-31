@@ -74,6 +74,31 @@ struct Vehicle: Identifiable, Codable, Hashable {
     }
 }
 
+extension Vehicle {
+    init(tripCar: TripCar) {
+        self.init(
+            id: tripCar.id,
+            userId: tripCar.user.id,
+            brand: tripCar.brand,
+            model: tripCar.model,
+            year: tripCar.year,
+            description: nil,
+            mainPhoto: tripCar.mainPhoto.map {
+                VehiclePhoto(id: $0.id, mediaId: nil, url: $0.url, urlMobile: $0.url, alt: nil, isMain: nil, sortOrder: nil)
+            },
+            photos: nil,
+            user: VehicleOwner(id: tripCar.user.id, firstName: nil, lastName: nil, instagram: nil, name: tripCar.user.name, telegramUsername: nil),
+            photosCount: 0,
+            tripsCount: 0,
+            isActive: true,
+            schedule: .unknown,
+            canDelete: false,
+            createdAt: .now,
+            updatedAt: .now
+        )
+    }
+}
+
 struct VehiclePhoto: Identifiable, Codable, Hashable {
     let id: Int
     let mediaId: Int?

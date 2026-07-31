@@ -39,6 +39,9 @@ struct TripDetailView: View {
                         Divider()
                         attractionsSection(attractions)
                     }
+
+                    Divider()
+                    carsSection
                 }
                 .padding()
             }
@@ -46,7 +49,9 @@ struct TripDetailView: View {
         .navigationTitle(displayedTrip.title)
         .navigationBarTitleDisplayMode(.inline)
         .task {
-            await viewModel.fetch(slug: trip.slug)
+            async let fetchTrip: Void = viewModel.fetch(slug: trip.slug)
+            async let fetchCars: Void = viewModel.fetchCars(tripId: trip.id)
+            _ = await (fetchTrip, fetchCars)
         }
     }
 
@@ -184,6 +189,83 @@ struct TripDetailView: View {
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
+            }
+
+            Spacer()
+
+            Image(systemName: "chevron.right")
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(.tertiary)
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 10)
+        .contentShape(Rectangle())
+    }
+
+    private var carsSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Cars")
+                .font(.headline)
+
+            if viewModel.isLoadingCars {
+                ProgressView()
+                    .frame(maxWidth: .infinity, alignment: .center)
+            } else if let message = viewModel.carsErrorMessage, viewModel.cars.isEmpty {
+                ErrorBannerView(message: message) {
+                    await viewModel.fetchCars(tripId: trip.id)
+                }
+            } else if viewModel.cars.isEmpty {
+                Text("No cars linked to this trip yet")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            } else {
+                VStack(spacing: 0) {
+                    ForEach(viewModel.cars) { car in
+                        NavigationLink {
+                            VehicleDetailView(vehicle: Vehicle(tripCar: car))
+                        } label: {
+                            carRow(car)
+                        }
+                        .buttonStyle(.plain)
+
+                        if car.id != viewModel.cars.last?.id {
+                            Divider()
+                                .padding(.leading, 66)
+                        }
+                    }
+                }
+                .background(Color(.systemGray6), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+            }
+        }
+    }
+
+    private func carRow(_ car: TripCar) -> some View {
+        HStack(spacing: 12) {
+            AsyncImage(url: car.mainPhoto?.url) { image in
+                image
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+            } placeholder: {
+                Rectangle()
+                    .fill(Color(.systemGray5))
+                    .overlay(
+                        Image(systemName: "car.fill")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    )
+            }
+            .frame(width: 40, height: 40)
+            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text("\(car.brand) \(car.model)")
+                    .font(.subheadline)
+                    .foregroundStyle(.primary)
+                    .lineLimit(1)
+                Text("\(String(car.year)) · \(car.user.name)")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
             }
 
             Spacer()
