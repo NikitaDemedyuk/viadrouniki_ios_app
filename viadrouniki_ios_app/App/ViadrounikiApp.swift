@@ -1,7 +1,7 @@
 import SwiftUI
 
 @main
-struct viadrouniki_ios_appApp: App {
+struct ViadrounikiApp: App {
     @State private var appViewModel = AppViewModel()
 
     var body: some Scene {
