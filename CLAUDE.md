@@ -71,7 +71,7 @@ View (SwiftUI struct)
 ## Layout
 
 ```
-App/          viadrouniki_ios_appApp.swift, ContentView.swift (TabView), AppViewModel.swift
+App/          ViadrounikiApp.swift, ContentView.swift (TabView), AppViewModel.swift
 Models/       Trip, Point, Vehicle, AppUser, APIResponse
 Network/      APIClient.swift + APIClient+<Domain>.swift extensions, APIError.swift
 ViewModels/   <Domain>ListViewModel.swift, <Domain>DetailViewModel.swift
