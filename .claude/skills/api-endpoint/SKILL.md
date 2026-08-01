@@ -16,14 +16,15 @@ Every network call in this app goes through `APIClient` (`Network/APIClient.swif
    - Paginated list with a custom sort-field enum → pattern in `APIClient+Cars.swift`
    - Paginated list with an optional filter param (only appended when non-empty) → pattern in `APIClient+Attractions.swift`
    - Non-paginated GET returning a bare array (e.g. map pins) → `fetchAttractionsMap` in `APIClient+Attractions.swift`
-   - Single-resource GET by id → not yet on this branch; see `references/patterns.md` for the `SingleResponse<T>` wrapper pattern (used on `feature/vehicle-page`) — **check first whether `SingleResponse<T>` already exists in `Models/` before declaring it again**, it may have merged in by the time you're reading this.
+   - Single-resource GET by id → `fetchCar(id:)` in `APIClient+Cars.swift`, using the `SingleResponse<T>` wrapper. `SingleResponse<T>` already exists in `Models/APIResponse.swift` — reuse it, never redeclare it.
    - Authenticated call with no params → `fetchCurrentUser` in `APIClient+Auth.swift`
    - POST — **there is no existing POST endpoint anywhere in this codebase yet** (login is currently a UI stub with no real network call). `APIClient.post<T,B>` exists and is ready to use, but treat a new POST call with more scrutiny than a GET: confirm the request body shape and auth requirement explicitly with the user rather than assuming, since there's no precedent to pattern-match here.
 
 ## Rules that apply to every new function
 
 - **Locale**: any endpoint that returns user-facing localized text takes `locale: String = "ru"` and forwards it as a `locale` query param — this is the pattern in every existing GET except `fetchCurrentUser` (which has no localized content) and `fetchAttractionsMap`. Ask if you're not sure whether the new endpoint's response is localized.
-- **Pagination**: reuse `PaginatedResponse<T>` / `PaginationMeta` (declared in `Models/Trip.swift`) — never redeclare them. Page/perPage params follow the `page: Int = 1, perPage: Int = <endpoint-specific default>` shape.
+- **Pagination**: reuse `PaginatedResponse<T>` / `PaginationMeta` (declared in `Models/APIResponse.swift`, alongside `SingleResponse<T>`) — never redeclare them. Page/perPage params follow the `page: Int = 1, perPage: Int = <endpoint-specific default>` shape.
+- **Domain naming**: the network layer follows the *API's* resource name, not the app's model name — `APIClient+Attractions.swift` serves the `Point` model, `APIClient+Cars.swift` serves `Vehicle`. Match the file you're in; see the table in `CLAUDE.md`.
 - **Auth**: pass `requiresAuth: true` to `get(url:requiresAuth:)` for anything that needs a logged-in user; omit it (defaults to `false`) otherwise. Don't add manual `Authorization` header code — `APIClient.get`/`post` already do this centrally.
 - **Errors**: never add error handling in the new function itself. `APIClient.perform(_:)` already maps HTTP status codes and decode failures to `APIError` centrally — a new endpoint function should just be `let url = ...; return try await get(url: url)`, nothing more.
 - **Query item ordering**: match the existing style in the file you're editing (some files put `page` last, some first) rather than picking a new convention — consistency within a file matters more than a "correct" universal order here.
