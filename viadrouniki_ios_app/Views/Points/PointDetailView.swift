@@ -43,6 +43,9 @@ struct PointDetailView: View {
         }
         .navigationTitle(displayedPoint.name)
         .navigationBarTitleDisplayMode(.inline)
+        .navigationDestination(for: Trip.self) { trip in
+            TripDetailView(trip: trip)
+        }
         .task {
             async let fetchPoint: Void = viewModel.fetch(slug: point.slug)
             async let fetchTrips: Void = viewModel.fetchTrips(slug: point.slug)
@@ -141,10 +144,13 @@ struct PointDetailView: View {
             } else {
                 LazyVStack(spacing: 16) {
                     ForEach(viewModel.trips) { trip in
-                        TripCardView(trip: trip)
-                            .task {
-                                await viewModel.fetchMoreTripsIfNeeded(currentTrip: trip, slug: point.slug)
-                            }
+                        NavigationLink(value: trip) {
+                            TripCardView(trip: trip)
+                        }
+                        .buttonStyle(.plain)
+                        .task {
+                            await viewModel.fetchMoreTripsIfNeeded(currentTrip: trip, slug: point.slug)
+                        }
                     }
                 }
 
