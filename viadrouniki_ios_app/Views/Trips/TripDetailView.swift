@@ -122,8 +122,19 @@ struct TripDetailView: View {
         }
     }
 
+    private static let meetingTimeParser: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "HH:mm:ss"
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.timeZone = .current
+        return formatter
+    }()
+
     private var formattedMeetingTime: String {
-        String(displayedTrip.meetingTime.prefix(5))
+        guard let time = Self.meetingTimeParser.date(from: displayedTrip.meetingTime) else {
+            return displayedTrip.meetingTime
+        }
+        return time.formatted(.dateTime.hour().minute())
     }
 
     private func descriptionSection(_ text: String) -> some View {
