@@ -61,15 +61,8 @@ struct PointDetailView: View {
     }
 
     private var heroPhotoURL: URL? {
-        photoURL(for: displayedPoint.mainPhoto) ?? photoURL(for: displayedPoint.photos?.first)
-    }
-
-    private func photoURL(for photo: TripPhoto?) -> URL? {
-        horizontalSizeClass == .regular ? photo?.url : photo?.urlMobile
-    }
-
-    private func photoURL(for photo: PointPhoto?) -> URL? {
-        horizontalSizeClass == .regular ? photo?.url : photo?.urlMobile
+        displayedPoint.mainPhoto?.url(for: horizontalSizeClass)
+            ?? displayedPoint.photos?.first?.url(for: horizontalSizeClass)
     }
 
     // MARK: - Content sections

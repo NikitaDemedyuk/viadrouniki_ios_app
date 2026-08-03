@@ -67,8 +67,7 @@ struct TripCardView: View {
     }
 
     private var photoURL: URL? {
-        horizontalSizeClass == .regular
-            ? trip.mainPhoto?.url : trip.mainPhoto?.urlMobile
+        trip.mainPhoto?.url(for: horizontalSizeClass)
     }
 
     private var formattedDate: String {

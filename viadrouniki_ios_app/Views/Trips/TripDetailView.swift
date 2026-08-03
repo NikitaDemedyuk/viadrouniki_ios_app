@@ -60,13 +60,9 @@ struct TripDetailView: View {
     private var photoSection: some View {
         PhotoHeroView(
             photos: displayedTrip.photos,
-            heroURL: photoURL(for: displayedTrip.mainPhoto),
+            heroURL: displayedTrip.mainPhoto?.url(for: horizontalSizeClass),
             placeholderSystemImage: "map"
         )
-    }
-
-    private func photoURL(for photo: TripPhoto?) -> URL? {
-        horizontalSizeClass == .regular ? photo?.url : photo?.urlMobile
     }
 
     // MARK: - Content sections

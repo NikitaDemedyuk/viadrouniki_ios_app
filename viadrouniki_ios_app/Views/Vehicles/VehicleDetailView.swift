@@ -55,13 +55,10 @@ struct VehicleDetailView: View {
     private var photoSection: some View {
         PhotoHeroView(
             photos: displayedVehicle.photos,
-            heroURL: photoURL(for: displayedVehicle.photos?.first ?? displayedVehicle.mainPhoto),
+            heroURL: (displayedVehicle.photos?.first ?? displayedVehicle.mainPhoto)?
+                .url(for: horizontalSizeClass),
             placeholderSystemImage: "car.fill"
         )
-    }
-
-    private func photoURL(for photo: VehiclePhoto?) -> URL? {
-        horizontalSizeClass == .regular ? photo?.url : photo?.urlMobile
     }
 
     // MARK: - Content sections

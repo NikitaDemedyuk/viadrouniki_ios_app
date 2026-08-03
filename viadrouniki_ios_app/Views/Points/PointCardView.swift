@@ -61,7 +61,6 @@ struct PointCardView: View {
     }
 
     private var photoURL: URL? {
-        horizontalSizeClass == .regular
-            ? point.mainPhoto?.url : point.mainPhoto?.urlMobile
+        point.mainPhoto?.url(for: horizontalSizeClass)
     }
 }
