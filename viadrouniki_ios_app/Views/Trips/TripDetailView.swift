@@ -186,12 +186,7 @@ struct TripDetailView: View {
                     .foregroundStyle(.primary)
                     .lineLimit(1)
 
-                if !attraction.address.isEmpty {
-                    Text(attraction.address)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .lineLimit(1)
-                } else if let typeName = attraction.type?.name, !typeName.isEmpty {
+                if let typeName = attraction.type?.name, !typeName.isEmpty {
                     Text(typeName)
                         .font(.caption)
                         .foregroundStyle(.secondary)
