@@ -61,9 +61,6 @@ final class APIClient {
                 do {
                     return try decoder.decode(T.self, from: data)
                 } catch {
-                    #if DEBUG
-                    print("[APIClient] Failed to decode \(T.self) from \(request.url?.absoluteString ?? "?"): \(error)")
-                    #endif
                     throw APIError.decodingError(error)
                 }
             case 401:
