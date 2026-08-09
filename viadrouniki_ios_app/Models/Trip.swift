@@ -21,22 +21,30 @@ struct Trip: Identifiable, Codable, Hashable {
     let maxParticipants: Int?
     let currentParticipants: Int
     let attractionsCount: Int
-    let applicationsCount: Int
+    let applicationsCount: Int?
     let photosCount: Int
     let carsCount: Int
     let rating: Double?
     let ratingsCount: Int
     let organizer: TripOrganizer
     let mainPhoto: TripPhoto?
+    let photos: [TripPhoto]?
+    let attractions: [TripAttraction]?
+    private let rawExternalLinks: ExternalLinkList?
     let isActive: Bool
     let canAcceptApplications: Bool
     let canSubmitApplication: Bool
     let createdAt: Date
     let updatedAt: Date
 
+    var externalLinks: [ExternalLink] {
+        rawExternalLinks?.items ?? []
+    }
+
     enum CodingKeys: String, CodingKey {
-        case id, title, subtitle, number, slug, status, rating
+        case id, title, subtitle, number, slug, status, rating, photos, attractions
         case tripDescription        = "description"
+        case rawExternalLinks       = "external_links"
         case routeLengthKm          = "route_length_km"
         case startDate              = "start_date"
         case endDate                = "end_date"
@@ -94,12 +102,129 @@ struct TripOrganizer: Codable, Hashable {
 
 struct TripPhoto: Identifiable, Codable, Hashable {
     let id: Int
+    let mediaId: Int?
     let url: URL
     let urlMobile: URL
     let alt: String?
+    let isMain: Bool?
+    let sortOrder: Int?
 
     enum CodingKeys: String, CodingKey {
         case id, url, alt
+        case mediaId = "media_id"
         case urlMobile = "url_mobile"
+        case isMain = "is_main"
+        case sortOrder = "sort_order"
     }
+}
+
+extension TripPhoto: PhotoResource {}
+
+struct ExternalLink: Codable, Hashable {
+    let url: URL
+    let label: String
+}
+
+/// Decoding adapter for `external_links`, which the API encodes inconsistently:
+/// `[]`, `[{"url","label"}]`, or a `{"map": "...", "link": "..."}` object with
+/// plain URL strings. This normalizes all three shapes instead of throwing.
+///
+/// Always held as an optional so a missing key can't fail the whole model —
+/// read it through the owning type's `externalLinks` property, never directly.
+struct ExternalLinkList: Codable, Hashable {
+    let items: [ExternalLink]
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        if let array = try? container.decode([ExternalLink].self) {
+            items = array
+        } else if let dictionary = try? container.decode([String: String].self) {
+            items = dictionary.compactMap { key, value in
+                URL(string: value).map { ExternalLink(url: $0, label: key) }
+            }
+        } else {
+            items = []
+        }
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(items)
+    }
+}
+
+struct TripAttraction: Identifiable, Codable, Hashable {
+    /// Identity is the trip-attraction row, not the attraction: a route may
+    /// visit the same place twice, which would give two rows the same
+    /// `attractionId`. Use `attractionId` when addressing the attraction
+    /// itself (e.g. building a `Point`), never as a list identity.
+    let id: Int
+    let attractionId: Int
+    let name: String
+    let slug: String
+    let address: String
+    let attractionDescription: String
+    private let rawExternalLinks: ExternalLinkList?
+    let latitude: Double?
+    let longitude: Double?
+    let visitedAt: Date?
+    let visited: Bool
+    let sortOrder: Int
+    let tripsCount: Int
+    let type: AttractionType?
+
+    var externalLinks: [ExternalLink] {
+        rawExternalLinks?.items ?? []
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case name, slug, address, latitude, longitude, visited, type
+        case id                   = "trip_attraction_id"
+        case attractionId         = "id"
+        case attractionDescription = "description"
+        case rawExternalLinks     = "external_links"
+        case visitedAt            = "visited_at"
+        case sortOrder            = "sort_order"
+        case tripsCount           = "trips_count"
+    }
+}
+
+struct AttractionType: Codable, Hashable {
+    let id: Int
+    let name: String
+    let slug: String
+    let icon: String?
+    let iconMedia: String?
+
+    enum CodingKeys: String, CodingKey {
+        case id, name, slug, icon
+        case iconMedia = "icon_media"
+    }
+}
+
+/// The `trips/{id}/cars` endpoint returns a slimmed-down car shape (no
+/// pagination, far fewer fields than `Vehicle`) — kept separate rather than
+/// reused so `Vehicle`'s decode isn't weakened for its own endpoints.
+struct TripCar: Identifiable, Codable, Hashable {
+    let id: Int
+    let brand: String
+    let model: String
+    let year: Int
+    let user: TripCarOwner
+    let mainPhoto: TripCarPhoto?
+
+    enum CodingKeys: String, CodingKey {
+        case id, brand, model, year, user
+        case mainPhoto = "main_photo"
+    }
+}
+
+struct TripCarOwner: Codable, Hashable {
+    let id: Int
+    let name: String
+}
+
+struct TripCarPhoto: Codable, Hashable {
+    let id: Int
+    let url: URL
 }

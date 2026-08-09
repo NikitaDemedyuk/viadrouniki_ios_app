@@ -87,4 +87,26 @@ extension Point {
         createdAt = .now
         updatedAt = .now
     }
+
+    init(attraction: TripAttraction) {
+        id = attraction.attractionId
+        name = attraction.name
+        slug = attraction.slug
+        if let attractionType = attraction.type {
+            type = PointType(id: attractionType.id, name: attractionType.name, slug: attractionType.slug)
+        } else {
+            type = PointType(id: 0, name: "", slug: "")
+        }
+        address = attraction.address.isEmpty ? nil : attraction.address
+        latitude = attraction.latitude.map { "\($0)" }
+        longitude = attraction.longitude.map { "\($0)" }
+        description = attraction.attractionDescription.isEmpty ? nil : attraction.attractionDescription
+        mainPhoto = nil
+        photos = nil
+        tripsCount = attraction.tripsCount
+        photosCount = 0
+        isActive = true
+        createdAt = .now
+        updatedAt = .now
+    }
 }

@@ -7,6 +7,9 @@ struct TripListView: View {
         NavigationStack {
             content
                 .navigationTitle("Trips")
+                .navigationDestination(for: Trip.self) { trip in
+                    TripDetailView(trip: trip)
+                }
                 .refreshable { await viewModel.fetchInitial() }
         }
         .task { await viewModel.fetchInitial() }
@@ -32,10 +35,13 @@ struct TripListView: View {
         ScrollView {
             LazyVStack(spacing: 16) {
                 ForEach(viewModel.trips) { trip in
-                    TripCardView(trip: trip)
-                        .task {
-                            await viewModel.fetchMoreIfNeeded(currentTrip: trip)
-                        }
+                    NavigationLink(value: trip) {
+                        TripCardView(trip: trip)
+                    }
+                    .buttonStyle(.plain)
+                    .task {
+                        await viewModel.fetchMoreIfNeeded(currentTrip: trip)
+                    }
                 }
             }
             .padding()

@@ -43,6 +43,9 @@ struct VehicleDetailView: View {
         }
         .navigationTitle("\(vehicle.brand) \(vehicle.model)")
         .navigationBarTitleDisplayMode(.inline)
+        .navigationDestination(for: Trip.self) { trip in
+            TripDetailView(trip: trip)
+        }
         .task {
             async let fetchVehicle: Void = viewModel.fetch(id: vehicle.id)
             async let fetchTrips: Void = viewModel.fetchTrips(vehicleId: vehicle.id)
@@ -55,13 +58,10 @@ struct VehicleDetailView: View {
     private var photoSection: some View {
         PhotoHeroView(
             photos: displayedVehicle.photos,
-            heroURL: photoURL(for: displayedVehicle.photos?.first ?? displayedVehicle.mainPhoto),
+            heroURL: (displayedVehicle.photos?.first ?? displayedVehicle.mainPhoto)?
+                .url(for: horizontalSizeClass),
             placeholderSystemImage: "car.fill"
         )
-    }
-
-    private func photoURL(for photo: VehiclePhoto?) -> URL? {
-        horizontalSizeClass == .regular ? photo?.url : photo?.urlMobile
     }
 
     // MARK: - Content sections
@@ -157,8 +157,11 @@ struct VehicleDetailView: View {
             } else {
                 VStack(spacing: 16) {
                     ForEach(viewModel.trips) { trip in
-                        TripCardView(trip: trip)
-                            .task { await viewModel.fetchMoreTripsIfNeeded(currentTrip: trip, vehicleId: vehicle.id) }
+                        NavigationLink(value: trip) {
+                            TripCardView(trip: trip)
+                        }
+                        .buttonStyle(.plain)
+                        .task { await viewModel.fetchMoreTripsIfNeeded(currentTrip: trip, vehicleId: vehicle.id) }
                     }
                 }
             }

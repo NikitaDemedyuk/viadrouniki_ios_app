@@ -72,7 +72,7 @@ View (SwiftUI struct)
 
 ```
 App/          ViadrounikiApp.swift, ContentView.swift (TabView), AppViewModel.swift
-Models/       Trip, Point, Vehicle, AppUser, APIResponse
+Models/       Trip, Point, Vehicle, AppUser, APIResponse, PhotoResource
 Network/      APIClient.swift + APIClient+<Domain>.swift extensions, APIError.swift
 ViewModels/   <Domain>ListViewModel.swift, <Domain>DetailViewModel.swift
 Views/        <Domain>s/ per feature, plus Components/ for shared views
@@ -84,10 +84,13 @@ Utilities/    AuthTokenStore, KeychainStore
 - `PaginatedResponse<T>`, `PaginationMeta`, `SingleResponse<T>` — all in
   **`Models/APIResponse.swift`**.
 - `SortOrder` — in `Network/APIClient+Trips.swift`.
-- `PhotoResource` (protocol: `url`, `urlMobile`, `isMain`) and the generic
-  `PhotoHeroView<Photo: PhotoResource>` — in `Views/Components/`. `PointPhoto` and
-  `VehiclePhoto` conform. New photo models should conform too rather than hand-rolling
-  size-class URL selection.
+- `PhotoResource` (protocol: `url`, `urlMobile`, `isMain`) — in `Models/PhotoResource.swift`,
+  since it's a data contract that model types conform to (`TripPhoto`, `PointPhoto`,
+  `VehiclePhoto`), not a view. Its size-class URL selection (`url(for:)`) lives separately in
+  `Views/Components/PhotoResource+SizeClass.swift`, since that helper needs SwiftUI's
+  `UserInterfaceSizeClass` and the protocol itself must stay SwiftUI-free. The generic
+  `PhotoHeroView<Photo: PhotoResource>` is in `Views/Components/`. New photo models should
+  conform to `PhotoResource` too rather than hand-rolling size-class URL selection.
 
 ## Naming: model and endpoint domains diverge
 

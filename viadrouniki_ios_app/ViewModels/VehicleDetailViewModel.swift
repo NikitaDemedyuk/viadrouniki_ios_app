@@ -23,7 +23,7 @@ final class VehicleDetailViewModel {
         do {
             vehicle = try await APIClient.shared.fetchCar(id: id)
         } catch {
-            errorMessage = error.localizedDescription
+            errorMessage = error.presentableMessage
         }
         isLoading = false
     }
@@ -38,7 +38,7 @@ final class VehicleDetailViewModel {
             currentTripsPage = 1
             hasMoreTrips = response.meta.currentPage < response.meta.lastPage
         } catch {
-            tripsErrorMessage = error.localizedDescription
+            tripsErrorMessage = error.presentableMessage
         }
         isLoadingTrips = false
     }
@@ -58,7 +58,7 @@ final class VehicleDetailViewModel {
             currentTripsPage = nextPage
             hasMoreTrips = response.meta.currentPage < response.meta.lastPage
         } catch {
-            tripsErrorMessage = error.localizedDescription
+            tripsErrorMessage = error.presentableMessage
         }
 
         isFetchingMoreTrips = false

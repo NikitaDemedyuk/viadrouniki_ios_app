@@ -62,8 +62,7 @@ struct VehicleCardView: View {
     }
 
     private var photoURL: URL? {
-        horizontalSizeClass == .regular
-            ? vehicle.mainPhoto?.url : vehicle.mainPhoto?.urlMobile
+        vehicle.mainPhoto?.url(for: horizontalSizeClass)
     }
 }
 

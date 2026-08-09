@@ -24,7 +24,9 @@ struct TripCardView: View {
 
                 HStack(spacing: 12) {
                     Label(formattedDate, systemImage: "calendar")
-                    Label("\(trip.applicationsCount)", systemImage: "car")
+                    if let applicationsCount = trip.applicationsCount {
+                        Label("\(applicationsCount)", systemImage: "car")
+                    }
                     Label("\(trip.attractionsCount)", systemImage: "mappin")
 
                     if let km = trip.routeLengthKm {
@@ -65,8 +67,7 @@ struct TripCardView: View {
     }
 
     private var photoURL: URL? {
-        horizontalSizeClass == .regular
-            ? trip.mainPhoto?.url : trip.mainPhoto?.urlMobile
+        trip.mainPhoto?.url(for: horizontalSizeClass)
     }
 
     private var formattedDate: String {

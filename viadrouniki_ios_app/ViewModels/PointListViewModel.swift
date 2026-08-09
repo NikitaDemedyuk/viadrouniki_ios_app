@@ -33,7 +33,7 @@ final class PointListViewModel {
             currentPage = 1
             hasMorePages = response.meta.currentPage < response.meta.lastPage
         } catch {
-            errorMessage = error.localizedDescription
+            errorMessage = error.presentableMessage
         }
 
         isLoading = false
@@ -57,7 +57,7 @@ final class PointListViewModel {
             currentPage = nextPage
             hasMorePages = response.meta.currentPage < response.meta.lastPage
         } catch {
-            errorMessage = error.localizedDescription
+            errorMessage = error.presentableMessage
         }
 
         isFetchingMore = false
@@ -70,7 +70,7 @@ final class PointListViewModel {
         do {
             mapPoints = try await APIClient.shared.fetchAttractionsMap()
         } catch {
-            mapErrorMessage = error.localizedDescription
+            mapErrorMessage = error.presentableMessage
         }
         isLoadingMap = false
     }

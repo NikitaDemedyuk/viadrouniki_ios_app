@@ -21,7 +21,7 @@ struct PhotoHeroView<Photo: PhotoResource>: View {
         GeometryReader { geometry in
             TabView {
                 ForEach(photos) { photo in
-                    let url = horizontalSizeClass == .regular ? photo.url : photo.urlMobile
+                    let url = photo.url(for: horizontalSizeClass)
                     AsyncImage(url: url) { image in
                         image
                             .resizable()

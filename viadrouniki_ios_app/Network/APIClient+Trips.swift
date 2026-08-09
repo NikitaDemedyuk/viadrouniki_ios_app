@@ -6,6 +6,32 @@ enum SortOrder: String {
 }
 
 extension APIClient {
+    func fetchTrip(
+        slug: String,
+        locale: String = "ru"
+    ) async throws -> Trip {
+        let url = baseURL
+            .appending(path: "trips/slug/\(slug)")
+            .appending(queryItems: [
+                URLQueryItem(name: "locale", value: locale)
+            ])
+        let response: SingleResponse<Trip> = try await get(url: url)
+        return response.data
+    }
+
+    func fetchTripCars(
+        id: Int,
+        locale: String = "ru"
+    ) async throws -> [TripCar] {
+        let url = baseURL
+            .appending(path: "trips/\(id)/cars")
+            .appending(queryItems: [
+                URLQueryItem(name: "locale", value: locale)
+            ])
+        let response: SingleResponse<[TripCar]> = try await get(url: url)
+        return response.data
+    }
+
     func fetchTrips(
         page: Int = 1,
         perPage: Int = 18,
