@@ -123,10 +123,3 @@ struct PointsFilterSheet: View {
         selectedFilterKeys = attractionTypes.defaultSelectedFilterKeys
     }
 }
-
-#Preview {
-    PointsFilterSheet(
-        attractionTypes: [],
-        selectedFilterKeys: .constant([])
-    )
-}
