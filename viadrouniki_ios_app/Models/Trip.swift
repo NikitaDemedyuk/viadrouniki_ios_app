@@ -189,19 +189,6 @@ struct TripAttraction: Identifiable, Codable, Hashable {
     }
 }
 
-struct AttractionType: Codable, Hashable {
-    let id: Int
-    let name: String
-    let slug: String
-    let icon: String?
-    let iconMedia: String?
-
-    enum CodingKeys: String, CodingKey {
-        case id, name, slug, icon
-        case iconMedia = "icon_media"
-    }
-}
-
 /// The `trips/{id}/cars` endpoint returns a slimmed-down car shape (no
 /// pagination, far fewer fields than `Vehicle`) — kept separate rather than
 /// reused so `Vehicle`'s decode isn't weakened for its own endpoints.
