@@ -6,6 +6,10 @@ import Observation
 final class PointListViewModel {
     var points: [Point] = []
     var mapPoints: [PointMapItem] = []
+    var attractionTypesById: [Int: AttractionType] = [:]
+    /// Which groups of points the map shows. Set to the default selection
+    /// (see `defaultSelectedFilterKeys`) once types load.
+    var selectedFilterKeys: Set<PointFilterKey> = []
     var searchText: String = ""
     var isLoading = false
     var isLoadingMap = false
@@ -67,11 +71,47 @@ final class PointListViewModel {
         guard mapPoints.isEmpty, !isLoadingMap else { return }
         isLoadingMap = true
         mapErrorMessage = nil
+
+        // Fetched together so markers are only ever built once already tinted:
+        // MapKit's SwiftUI wrapper doesn't reliably re-tint a marker it has
+        // already materialized once attraction types arrive a moment later.
+        async let typesTask: [AttractionType] = (try? APIClient.shared.fetchAttractionTypes()) ?? []
         do {
-            mapPoints = try await APIClient.shared.fetchAttractionsMap()
+            let points = try await APIClient.shared.fetchAttractionsMap()
+            let types = await typesTask
+            // `uniquingKeysWith:` rather than `uniqueKeysWithValues:`: the latter
+            // traps on a duplicate id, which is server-controlled input.
+            attractionTypesById = Dictionary(
+                types.map { ($0.id, $0) },
+                uniquingKeysWith: { _, latest in latest }
+            )
+            selectedFilterKeys = types.defaultSelectedFilterKeys
+            mapPoints = points
         } catch {
             mapErrorMessage = error.presentableMessage
         }
+
         isLoadingMap = false
+    }
+
+    /// Whether the filter affordance has anything to offer. False when the
+    /// attraction-types request failed, in which case every point is shown
+    /// untinted and there is nothing to filter by.
+    var canFilterMapPoints: Bool {
+        !attractionTypesById.isEmpty
+    }
+
+    /// The point's attraction type, or nil if it carries no type or one the
+    /// types endpoint didn't return.
+    func attractionType(for point: PointMapItem) -> AttractionType? {
+        point.type.flatMap { attractionTypesById[$0] }
+    }
+
+    func filterKey(for point: PointMapItem) -> PointFilterKey {
+        attractionType(for: point).map { .type($0.id) } ?? .unknown
+    }
+
+    var filteredMapPoints: [PointMapItem] {
+        mapPoints.filter { selectedFilterKeys.contains(filterKey(for: $0)) }
     }
 }
