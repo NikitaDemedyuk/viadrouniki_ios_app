@@ -68,4 +68,15 @@ extension APIClient {
                 ])
         return try await get(url: url)
     }
+
+    func fetchAttractionTypes(locale: String = "ru") async throws -> [AttractionType] {
+        let url =
+            baseURL
+                .appending(path: "attraction-types")
+                .appending(queryItems: [
+                    URLQueryItem(name: "locale", value: locale),
+                ])
+        let response: SingleResponse<[AttractionType]> = try await get(url: url)
+        return response.data
+    }
 }

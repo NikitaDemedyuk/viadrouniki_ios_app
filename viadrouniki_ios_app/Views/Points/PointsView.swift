@@ -10,6 +10,7 @@ struct PointsView: View {
     @State private var viewModel = PointListViewModel()
     @State private var displayMode: DisplayMode = .list
     @State private var selectedMapPoint: PointMapItem?
+    @State private var isFilterPresented = false
 
     var body: some View {
         @Bindable var viewModel = viewModel
@@ -98,10 +99,11 @@ struct PointsView: View {
             ),
             selection: $selectedMapPoint
         ) {
-            ForEach(viewModel.mapPoints) { point in
+            ForEach(viewModel.filteredMapPoints) { point in
                 if let lat = point.latitude, let lon = point.longitude,
                    let slug = point.slug, !slug.isEmpty
                 {
+                    let attractionType = viewModel.attractionType(for: point)
                     Marker(
                         point.name ?? "",
                         coordinate: CLLocationCoordinate2D(
@@ -109,6 +111,7 @@ struct PointsView: View {
                             longitude: lon
                         )
                     )
+                    .tint(attractionType?.parsedColor ?? .red)
                     .tag(point)
                 }
             }
@@ -119,16 +122,24 @@ struct PointsView: View {
             PointDetailView(point: Point(mapItem: mapPoint))
         }
         .overlay(alignment: .bottomTrailing) {
-            Button {
-                // TODO: open filter sheet
-            } label: {
-                Image(systemName: "line.3.horizontal.decrease")
-                    .font(.title3)
-                    .padding(14)
-                    .glassEffect(in: .circle)
+            if viewModel.canFilterMapPoints {
+                Button {
+                    isFilterPresented = true
+                } label: {
+                    Image(systemName: "line.3.horizontal.decrease")
+                        .font(.title3)
+                        .padding(14)
+                        .glassEffect(in: .circle)
+                }
+                .padding(.trailing, 16)
+                .padding(.bottom, 40)
             }
-            .padding(.trailing, 16)
-            .padding(.bottom, 40)
+        }
+        .sheet(isPresented: $isFilterPresented) {
+            PointsFilterSheet(
+                attractionTypes: Array(viewModel.attractionTypesById.values),
+                selectedFilterKeys: $viewModel.selectedFilterKeys
+            )
         }
         .overlay(alignment: .bottom) {
             if let error = viewModel.mapErrorMessage {
