@@ -3,7 +3,7 @@
 Project constants live in `CLAUDE.md` (repo root). Short version for this checklist:
 iOS 26.5 target, **Swift 5 language mode with `minimal` strict concurrency**,
 `SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor`, MVVM + `@Observable`, SwiftUI only,
-no service/DI layer, no test target.
+no service/DI layer, no test target, no localization catalog.
 
 ## Contents
 1. Architecture & layering
@@ -33,9 +33,12 @@ Check:
 - [ ] ViewModels do not import SwiftUI. If a ViewModel needs SwiftUI types (Color, Image), the design is wrong — expose data, let the View decide presentation.
 - [ ] ViewModels reach the network through `APIClient.shared` directly. **This is correct here** — there is no service protocol layer and no DI, by decision (see `CLAUDE.md`). Do not flag it, and do not propose introducing a protocol/DI layer as part of an unrelated review.
 - [ ] Networking goes through an `extension APIClient`, never raw `URLSession` at the call site. New endpoints add nothing but a URL and `try await get(url:)` — error handling is centralized in `APIClient.perform(_:)`, so per-endpoint `do/catch` is a 🟡 finding.
-- [ ] Shared types are reused, not redeclared: `PaginatedResponse`/`PaginationMeta`/`SingleResponse` (`Models/APIResponse.swift`), `SortOrder` (`APIClient+Trips.swift`), `PhotoResource`/`PhotoHeroView` (`Views/Components/`). Redeclaring any of these is a 🔴.
+- [ ] Shared types are reused, not redeclared: `PaginatedResponse`/`PaginationMeta`/`SingleResponse` (`Models/APIResponse.swift`), `SortOrder` (`APIClient+Trips.swift`), `PhotoResource`/`PhotoHeroView` (`Views/Components/`), `AttractionType` (`Models/AttractionType.swift`). Redeclaring any of these is a 🔴. The full list is in `CLAUDE.md`; read it rather than trusting this line to stay current.
+- [ ] **Nothing under `Models/` imports SwiftUI.** A model that needs a `Color`, SF Symbol, or size class gets a `<Type>+<Purpose>.swift` extension under `Views/Components/` — the split `PhotoResource`/`PhotoResource+SizeClass` and `AttractionType`/`AttractionType+Presentation` both follow. A SwiftUI import under `Models/` is a 🟡 misplacement, even when the code inside it is correct.
+- [ ] A model shared by more than one endpoint lives in its own file, not inside the first model file that happened to need it — and adding a field to it widens the decode surface of *every* response that embeds it. `AttractionType` is embedded in `TripAttraction`, so a new field there can break the trips screens.
 - [ ] Models are structs. A class model needs a written justification (identity semantics, reference sharing).
 - [ ] New photo models conform to `PhotoResource` instead of hand-rolling size-class URL selection.
+- [ ] Domain vocabulary the app invents (as opposed to decodes) is a named type, not an overloaded `Optional`. `PointFilterKey.unknown` beats `nil` as a dictionary key meaning "no type, or a type we don't recognise" — `Set<Int?>` typechecks but hides the case from the reader.
 - [ ] No new third-party dependencies introduced without explicit approval in the task description.
 
 ## §2 Concurrency
@@ -85,11 +88,28 @@ View body rules:
 - [ ] View bodies over ~50 lines: suggest extracting subviews or computed properties. (Flutter mapping: same instinct as splitting a giant `build()` into widgets.)
 - [ ] Navigation uses `NavigationStack` with typed paths, not deprecated `NavigationView`.
 - [ ] Deployment target is iOS 26.5, so current APIs are available unconditionally and availability checks are almost never needed — flag `if #available` guards for anything already covered by the target. Note that some existing code predates this and still uses older equivalents (`ContentView`'s `.tabItem`/`.tag` rather than `Tab`); modernizing it is a deliberate task, not something to demand in an unrelated review.
-- [ ] Text shown to users is localizable (`String(localized:)` or string literals in `Text` which auto-localize) — flag hardcoded user-facing strings built with interpolation that bypasses localization.
+- [ ] **Do not flag hardcoded UI strings.** The project has no localization catalog (`CLAUDE.md`);
+      English literals inline in Views are the convention, and the `locale: "ru"` query param
+      only governs API content. Raising this means raising every View in the project. It becomes
+      a real check once a catalog exists — not before.
 
 ## §4 Swift language & memory
 
 - [ ] No force unwraps (`!`) or force tries (`try!`) in production code. Allowed in tests and `#Preview` blocks. `IUO` properties (`var x: T!`) are a 🔴 outside of rare framework-imposed cases.
+- [ ] **Trapping initializers applied to server data.** `!` is not the only way to crash on a
+      payload. `Dictionary(uniqueKeysWithValues:)` traps on a duplicate key, `Array`
+      subscripting traps out of range, and `precondition`/`fatalError` in a decode path trap by
+      design — none of them throw, so `APIError` handling and `try?` do not catch them. When
+      the input comes from the API, prefer the total form:
+      ```swift
+      // traps if the API ever repeats an id
+      Dictionary(uniqueKeysWithValues: types.map { ($0.id, $0) })
+      // resolves instead
+      Dictionary(types.map { ($0.id, $0) }, uniquingKeysWith: { _, latest in latest })
+      ```
+      (Flutter mapping: Dart would just overwrite the duplicate key and move on — Swift's
+      "unique" initializer means *you promise* they're unique, and it kills the app if you're
+      wrong.)
 - [ ] No `try?` that silently swallows errors on user-facing flows — errors surface to the ViewModel and become presentable state (alert, inline message, retry).
 - [ ] Closures stored by a class capture `self` weakly (`[weak self]`) unless the lifetime relationship is provably safe — document it if so. Delegate properties are `weak var`. (Flutter mapping: Dart's GC collects cycles; ARC does not — this is new for you and generated code gets it wrong constantly.)
 - [ ] Escaping closures in async pipelines: prefer async functions over closure callbacks entirely.
@@ -104,10 +124,36 @@ These checks exist specifically because code in this project is AI-generated.
 - [ ] **Hallucinated APIs.** Verify every non-obvious API against real SDK surface: method names, parameter labels, availability. Generated code invents plausible-looking methods (`.navigationBarLargeTitle(true)`, `URLSession.shared.fetch(...)`). If the build passes this is covered; if reviewing statically, verify anything you don't personally recognize.
 - [ ] **Deprecated patterns presented as current.** Common ones: `NavigationView`, `ObservableObject`/`@Published`/`@StateObject`, `.foregroundColor` vs `.foregroundStyle`, `onChange(of:) { newValue in }` single-parameter form, `Task.init` for fire-and-forget UI updates instead of `.task`.
 - [ ] **Duplicated logic.** Search the codebase for existing extensions, formatters, network helpers before accepting new ones. Generated code re-creates what it can't see.
+- [ ] **One rule encoded twice, two different ways.** The subtler form of duplication: the same
+      business concept expressed with different criteria in different layers — e.g. a ViewModel
+      hiding amenities by `slug` in `["cafe", "azs"]` while a View groups them by
+      `sort_order >= 100`. Both are "which types are amenities?", they agree today, and they
+      will drift the moment a third amenity is added. Verify against live data whether two such
+      rules currently select the same rows (step 4 of the workflow), then collapse them into
+      one named property on the model — `isAmenity` — that both layers read.
 - [ ] **Speculative generality.** Protocols with one conformer created "for flexibility", generic parameters never used with a second type, configuration options nothing configures. Delete unless the task asked for it.
 - [ ] **Orphaned code.** Unused properties, dead functions, commented-out blocks, `// TODO` left by the generator.
 - [ ] **Fabricated resources.** References to asset names, localization keys, or file resources that don't exist in the bundle — these fail silently or at runtime, not at compile time.
+- [ ] **Guessed response envelopes.** `PaginatedResponse<T>` vs `SingleResponse<T>` vs a bare
+      top-level array is not inferable from the endpoint's name, and picking wrong compiles
+      fine and fails at runtime as `APIError.decodingError`. `curl` the endpoint (workflow
+      step 4) rather than pattern-matching a neighbouring function. Same for `Date` fields —
+      see the fractional-seconds note in `CLAUDE.md`; optionality does not rescue a bad format.
 - [ ] **Plausible-but-wrong logic.** Off-by-one in pagination, inverted booleans in guard conditions, wrong comparison in sorting. Read the logic as if it were written by a confident intern.
+- [ ] **Non-deterministic ordering.** `Dictionary`/`Set` iteration order is unspecified, and
+      Swift's `sorted(by:)` is **not stable**, so sorting an unordered collection on a key with
+      ties gives an arbitrary order for the tied elements — rows that visibly shuffle between
+      presentations. Check whether the sort key really is unique in the live data before
+      accepting a single-key sort; if it isn't, require a tiebreak on `id`:
+      ```swift
+      .sorted { ($0.sortOrder ?? 0, $0.id) < ($1.sortOrder ?? 0, $1.id) }
+      ```
+- [ ] **Unreachable defaults.** When initial state is computed inside a one-shot guarded load
+      (`guard mapPoints.isEmpty else { return }`), any UI control that overwrites that state
+      makes the default unrecoverable for the rest of the session. Trace every reset/clear
+      control back to whether the user can actually return to the starting state, and check
+      that a "Reset" labelled control restores defaults rather than clearing to empty — an
+      empty selection that renders a blank screen with no explanation is a bug, not a filter.
 
 ## §6 Testing
 

@@ -56,23 +56,32 @@ View (SwiftUI struct)
               └─> Model (struct, Codable, Hashable)
 ```
 
-- **There is no service/repository protocol layer and no dependency injection.** All five
-  ViewModels call `APIClient.shared` directly. This is the established convention — match it.
+- **There is no service/repository protocol layer and no dependency injection.** All six
+  ViewModels in `ViewModels/` call `APIClient.shared` directly (`AppViewModel` in `App/` does
+  no networking). This is the established convention — match it.
   The tradeoff is understood and accepted: ViewModels cannot currently be unit-tested without
   hitting the network. Since there is no test target, nothing is blocked by it today.
   Introducing a protocol + DI layer for a single new feature would make the codebase *less*
   consistent, not more, so don't do it as a side effect of other work. If the team wants that
-  layer, it is its own task covering all five ViewModels at once.
+  layer, it is its own task covering all six ViewModels at once.
 - Views hold no business logic and make no network calls.
 - ViewModels don't import SwiftUI — they expose data and let Views decide presentation.
-- Models are structs conforming to `Identifiable, Codable, Hashable`.
+- API payload models are structs conforming to `Identifiable, Codable, Hashable`. Not
+  everything in `Models/` is a payload model, though — `PointFilterKey` is a plain `Hashable`
+  enum with no `Codable` conformance, because it's app-side vocabulary shared by a ViewModel
+  and a View rather than anything the API sends.
+- **There is no localization catalog** — no `.xcstrings`, no `.lproj`. User-facing text is
+  English string literals inline in Views, while the API is asked for `locale: "ru"` content.
+  That is the current convention; do not flag hardcoded UI strings as a review finding, and do
+  not introduce `String(localized:)` piecemeal. Localizing the app is its own task.
 - No third-party dependencies.
 
 ## Layout
 
 ```
 App/          ViadrounikiApp.swift, ContentView.swift (TabView), AppViewModel.swift
-Models/       Trip, Point, Vehicle, AppUser, APIResponse, PhotoResource
+Models/       Trip, Point, Vehicle, AppUser, APIResponse, PhotoResource,
+              AttractionType, PointFilterKey
 Network/      APIClient.swift + APIClient+<Domain>.swift extensions, APIError.swift
 ViewModels/   <Domain>ListViewModel.swift, <Domain>DetailViewModel.swift
 Views/        <Domain>s/ per feature, plus Components/ for shared views
@@ -91,6 +100,21 @@ Utilities/    AuthTokenStore, KeychainStore
   `UserInterfaceSizeClass` and the protocol itself must stay SwiftUI-free. The generic
   `PhotoHeroView<Photo: PhotoResource>` is in `Views/Components/`. New photo models should
   conform to `PhotoResource` too rather than hand-rolling size-class URL selection.
+- `AttractionType` — in `Models/AttractionType.swift`, **not** in `Trip.swift`, even though
+  `TripAttraction.type` is one. It backs its own endpoint as well, so it's shared: adding a
+  field to it widens the decode surface of the trips responses too. Its SwiftUI presentation
+  helpers (`parsedColor`, `sfSymbolName`) live in
+  `Views/Components/AttractionType+Presentation.swift`.
+- `PointFilterKey` (`.type(Int)` / `.unknown`) — in `Models/PointFilterKey.swift`, with the
+  `Collection<AttractionType>` helpers that build selections of it. It exists so the
+  "point has no type, or a type the app doesn't know" case is named rather than smuggled
+  through an `Optional` key.
+
+**The model/presentation split is a rule, not two coincidences.** Types in `Models/` never
+import SwiftUI. When a model needs a `Color`, an SF Symbol, a size class, or any other
+SwiftUI-derived value, that goes in a `<Type>+<Purpose>.swift` extension under
+`Views/Components/`. Both `PhotoResource` and `AttractionType` follow this; a SwiftUI import
+appearing under `Models/` is the signal that something landed in the wrong folder.
 
 ## Naming: model and endpoint domains diverge
 
@@ -100,7 +124,7 @@ works across all layers:
 | Feature | Model / ViewModel / Views | Network extension | API path |
 |---|---|---|---|
 | Trips | `Trip`, `TripListViewModel`, `Views/Trips/` | `APIClient+Trips.swift` | `trips` |
-| Points | `Point`, `PointListViewModel`, `Views/Points/` | `APIClient+Attractions.swift` | `attractions` |
+| Points | `Point`, `PointListViewModel`, `Views/Points/` | `APIClient+Attractions.swift` | `attractions`, `attraction-types` |
 | Vehicles | `Vehicle`, `VehicleListViewModel`, `Views/Vehicles/` | `APIClient+Cars.swift` | `cars` |
 
 View file naming is also not uniform: `TripListView` and `VehicleListView`, but `PointsView`.
@@ -113,6 +137,20 @@ View file naming is also not uniform: `TripListView` and `VehicleListView`, but 
   `try await get(url:)` — no error handling of their own.
 - Endpoints returning localized text take `locale: String = "ru"` and forward it as a query
   param.
+- **Response envelopes are not uniform — check, don't assume.** Three shapes are in use:
+  paginated lists return `{"data": [...], "meta": {...}}` (`PaginatedResponse<T>`); single
+  resources and *some* collections return `{"data": ...}` (`SingleResponse<T>`, including
+  `SingleResponse<[AttractionType]>` for `attraction-types`); and `attractions/map` returns a
+  **bare top-level array** with no envelope at all. Picking the wrong one fails at runtime as
+  an `APIError.decodingError`, not at compile time. The API is public and read-only over GET,
+  so confirm the shape before writing the decode type:
+  ```bash
+  curl -s 'https://api.viadrouniki.by/v1/<path>?locale=ru' | head -c 400
+  ```
+- Timestamps are ISO8601 **with fractional seconds** (`2026-01-30T18:55:47.000000Z`). The
+  shared decoder in `APIClient` requires them; a field typed `Date` that arrives in any other
+  format fails the whole response decode, and making the property optional does *not* rescue
+  it — `decodeIfPresent` still runs the date strategy and rethrows.
 - `get(url:requiresAuth:)` defaults to `false`; `post` always attaches the token when one is
   present, with no opt-out.
 - There are **no POST endpoints in the app yet** — login is a UI stub. `APIClient.post` exists
