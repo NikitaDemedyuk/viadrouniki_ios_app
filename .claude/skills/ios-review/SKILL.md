@@ -33,10 +33,29 @@ Follow these steps in order. Do not skip step 1 — reviewing without building i
    ```
 
    There is no test target, so there are no tests to run. If no build environment is available, state this explicitly at the top of the review and manually check for hallucinated APIs (see reference checklist §5).
-2. **Check scope.** Compare the diff against the task it was supposed to accomplish. Flag any files or code added beyond the task scope — generated code often includes speculative helpers, unused abstractions, or duplicate logic that already exists elsewhere in the codebase. Search the codebase for existing equivalents before accepting new utilities.
-3. **Run the layered checklist.** Read `references/swift-checklist.md` and apply every section to the changed code. Do not review from memory — the checklist encodes project decisions that override general Swift habits.
-4. **Classify findings** using the severity levels below.
-5. **Write the review** using the output format below.
+2. **Establish the review target.** Don't assume the work is committed. A feature branch here
+   is often 0 commits ahead with everything sitting in the working tree, so `git diff <base>`
+   plus `git ls-files --others --exclude-standard` is the reliable pair — a `git diff
+   base...HEAD` alone can silently review an empty diff. Say in the review which you used.
+3. **Check scope.** Compare the diff against the task it was supposed to accomplish. Flag any files or code added beyond the task scope — generated code often includes speculative helpers, unused abstractions, or duplicate logic that already exists elsewhere in the codebase. Search the codebase for existing equivalents before accepting new utilities.
+4. **Check the code against real API data.** Whenever the diff decodes, sorts, groups, filters,
+   or thresholds anything the API returns, `curl` the endpoint and look at the actual payload.
+   The API is public and read-only over GET, so this is cheap and safe:
+
+   ```bash
+   curl -s 'https://api.viadrouniki.by/v1/<path>?locale=ru' | python3 -m json.tool | head -40
+   ```
+
+   This step exists because it is where the highest-value findings come from, and they are
+   findings that reading alone cannot produce. Confirm concretely: the envelope shape matches
+   the decode type (see `CLAUDE.md` — it is not uniform across endpoints); sort keys are
+   actually unique if the code assumes they are; ids used as dictionary keys are actually
+   unique; a "can't happen" branch really can't; and any magic threshold in the diff
+   (`>= 100`, `!= 0`) selects the rows the author thinks it does. Quote the real numbers in
+   the finding — "three types share `sort_order: 8`" lands where "ties are possible" does not.
+5. **Run the layered checklist.** Read `references/swift-checklist.md` and apply every section to the changed code. Do not review from memory — the checklist encodes project decisions that override general Swift habits.
+6. **Classify findings** using the severity levels below.
+7. **Write the review** using the output format below.
 
 ## Severity levels
 
@@ -44,7 +63,16 @@ Follow these steps in order. Do not skip step 1 — reviewing without building i
 - 🟡 **Should fix** — wrong but not dangerous: incorrect property wrapper choice that happens to work, missing `Sendable` annotations (the compiler will not flag these — strict concurrency is `minimal`), side effects in `body`, `.onAppear` used for async work instead of `.task`, missing error handling on user-facing flows.
 - 🟢 **Suggestion** — style, naming, decomposition of large views, more idiomatic Swift.
 
-Do **not** raise `APIClient.shared` used directly from a ViewModel as a finding at any level. It is the established convention in all five ViewModels and is documented in `CLAUDE.md`. Flagging it means flagging every file in the project, which is noise, not review.
+**Calibrating latent crashes.** A crash path you verified does *not* reproduce against current
+API data is 🟡, not 🔴 — name the trap and the input that would fire it. Reserve 🔴 for crashes
+reachable with data the app can actually receive today. Step 4 is what tells the two apart, so
+do it before assigning severity rather than guessing at the ceiling.
+
+Do **not** raise `APIClient.shared` used directly from a ViewModel as a finding at any level. It is the established convention in all six ViewModels and is documented in `CLAUDE.md`. Flagging it means flagging every file in the project, which is noise, not review.
+
+Likewise, do not raise hardcoded English UI strings. The project has no localization catalog
+at all — that is recorded in `CLAUDE.md` as the current convention, so flagging it is flagging
+every View in the project.
 
 Do not pad reviews. If code is clean, say so in two sentences and stop. Never invent findings to appear thorough.
 
@@ -56,7 +84,9 @@ ALWAYS use this exact template:
 # Review: <file(s) or feature name>
 
 **Build status:** <built clean / build failed: summary / could not build — reviewed statically>
+**Review target:** <committed diff vs <base> / uncommitted working tree vs <base> — say which>
 **Scope check:** <matches task / includes out-of-scope additions: list them>
+**API check:** <endpoints curled and what the real data confirmed or contradicted / n/a — diff touches no API data>
 
 ## Findings
 ### 🔴 Blockers
