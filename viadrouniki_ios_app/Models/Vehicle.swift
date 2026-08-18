@@ -130,11 +130,21 @@ enum VehicleSchedule: String, Codable {
         self = VehicleSchedule(rawValue: raw) ?? .unknown
     }
 
+    /// Used as an accessibility label, which takes a plain `String` and so is
+    /// resolved outside SwiftUI — hence the explicit language rather than
+    /// `Locale.current`. `String(localized:)` is Foundation, so this keeps
+    /// `Models/` free of SwiftUI.
+    ///
+    /// `bundle:` is what selects the language — `locale:` alone does not, it only
+    /// formats the interpolated values. See `AppLanguage.bundle`.
     var label: String {
+        let language = AppLanguage.current
+        let bundle = language.bundle
+        let locale = language.locale
         switch self {
-        case .summer: return "Summer"
-        case .winter: return "Winter"
-        case .unknown: return "Season"
+        case .summer: return String(localized: "Summer", bundle: bundle, locale: locale)
+        case .winter: return String(localized: "Winter", bundle: bundle, locale: locale)
+        case .unknown: return String(localized: "Season", bundle: bundle, locale: locale)
         }
     }
 }

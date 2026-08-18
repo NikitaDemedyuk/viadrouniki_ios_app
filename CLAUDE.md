@@ -70,18 +70,44 @@ View (SwiftUI struct)
   everything in `Models/` is a payload model, though — `PointFilterKey` is a plain `Hashable`
   enum with no `Codable` conformance, because it's app-side vocabulary shared by a ViewModel
   and a View rather than anything the API sends.
-- **There is no localization catalog** — no `.xcstrings`, no `.lproj`. User-facing text is
-  English string literals inline in Views, while the API is asked for `locale: "ru"` content.
-  That is the current convention; do not flag hardcoded UI strings as a review finding, and do
-  not introduce `String(localized:)` piecemeal. Localizing the app is its own task.
+- **The app is localized in Russian and Belarusian** via `Localizable.xcstrings` at the root of
+  the source folder. There is deliberately **no English UI** — the API has no English content
+  (`locale=en` silently returns Russian). English remains only the catalog's *source language*,
+  so UI strings are still written as English literals inline in Views; that's the key, not
+  something the user ever sees. New user-facing text needs a catalog entry with `ru` and `be`.
+- **The language is app-controlled, not system-controlled.** iOS ships no Belarusian display
+  language, so it can't be selected in Settings and the per-app language picker can't offer it
+  either. `AppLanguage` (UserDefaults-backed, defaults to Russian) is the source of truth, and
+  `ViadrounikiApp` forces it onto the tree with `.environment(\.locale,)`. That one modifier is
+  what localizes every `LocalizedStringKey` — `Text`, `Label`, `.navigationTitle`, `Button`,
+  `Picker`, `ContentUnavailableView`, `.searchable(prompt:)` — with no per-call-site work.
+  - The same root also carries `.id(appViewModel.language)`, which rebuilds the tree on a
+    language change so ViewModels are recreated and their `.task`s refetch API content in the
+    new locale. Don't remove it: without it the UI flips language but the data stays stale.
+  - **Anything resolved outside SwiftUI does not see that environment value** and must be
+    pointed at the language explicitly. `Locale.current` is the *device* language and is
+    essentially always wrong here.
+    - For `Date` format styles, `.locale(_:)` is enough (see `TripCardView`).
+    - For `String(localized:)`, it is **not**. `locale:` only formats the interpolated
+      values; the translation lookup goes through the *device's* preferred localization and
+      ignores it. Verified: with `ru.lproj`/`be.lproj` in the bundle and the device set to
+      English, `String(localized: "Hello", locale: Locale(identifier: "ru"))` returns the
+      Belarusian string. **Pass `bundle: AppLanguage.current.bundle`** — that is what
+      actually selects the language (see `APIError`, `VehicleSchedule.label`). Keep passing
+      `locale:` too, for interpolated numbers and dates.
+  - A literal only localizes where the parameter is a `LocalizedStringKey`. A `String` variable
+    or a ternary of two literals binds to the `StringProtocol` overload instead — pass `Text`
+    (as `PointsFilterSheet.row(title:)` and `PointsView` do). Conversely, API-supplied text is
+    already localized by the server and must *not* be looked up.
 - No third-party dependencies.
 
 ## Layout
 
 ```
 App/          ViadrounikiApp.swift, ContentView.swift (TabView), AppViewModel.swift
+Localizable.xcstrings   String Catalog (source language en; ru + be translations)
 Models/       Trip, Point, Vehicle, AppUser, APIResponse, PhotoResource,
-              AttractionType, PointFilterKey
+              AttractionType, PointFilterKey, AppLanguage
 Network/      APIClient.swift + APIClient+<Domain>.swift extensions, APIError.swift
 ViewModels/   <Domain>ListViewModel.swift, <Domain>DetailViewModel.swift
 Views/        <Domain>s/ per feature, plus Components/ for shared views
@@ -105,6 +131,12 @@ Utilities/    AuthTokenStore, KeychainStore
   field to it widens the decode surface of the trips responses too. Its SwiftUI presentation
   helpers (`parsedColor`, `sfSymbolName`) live in
   `Views/Components/AttractionType+Presentation.swift`.
+- `AppLanguage` (`.russian` / `.belarusian`) — in `Models/AppLanguage.swift`. The single source
+  of truth for the UI language *and* the API `locale` param. It's a static rather than a
+  property on `AppViewModel` because `APIClient` reads it, and the dependency direction forbids
+  the client reaching back up into a ViewModel. It vends three things, and they are not
+  interchangeable: `locale` (SwiftUI's `\.locale`, and formatting), `apiLocale` (the query
+  param), and `bundle` (the `.lproj` that `String(localized:bundle:)` needs).
 - `PointFilterKey` (`.type(Int)` / `.unknown`) — in `Models/PointFilterKey.swift`, with the
   `Collection<AttractionType>` helpers that build selections of it. It exists so the
   "point has no type, or a type the app doesn't know" case is named rather than smuggled
@@ -118,14 +150,38 @@ appearing under `Models/` is the signal that something landed in the wrong folde
 
 ## Naming: model and endpoint domains diverge
 
-The API's resource names don't match the app's domain names. Don't assume one placeholder
-works across all layers:
+The API's resource names don't match the app's domain names, and since localization landed,
+neither matches what the user actually reads. **Three independent vocabularies**, so don't
+assume one placeholder works across all layers:
 
-| Feature | Model / ViewModel / Views | Network extension | API path |
-|---|---|---|---|
-| Trips | `Trip`, `TripListViewModel`, `Views/Trips/` | `APIClient+Trips.swift` | `trips` |
-| Points | `Point`, `PointListViewModel`, `Views/Points/` | `APIClient+Attractions.swift` | `attractions`, `attraction-types` |
-| Vehicles | `Vehicle`, `VehicleListViewModel`, `Views/Vehicles/` | `APIClient+Cars.swift` | `cars` |
+| Feature | Model / ViewModel / Views | Network extension | API path | Catalog key | Shown as (ru / be) |
+|---|---|---|---|---|---|
+| Trips | `Trip`, `TripListViewModel`, `Views/Trips/` | `APIClient+Trips.swift` | `trips` | `Trips` | Маршруты / Маршруты |
+| Points | `Point`, `PointListViewModel`, `Views/Points/` | `APIClient+Attractions.swift` | `attractions`, `attraction-types` | `Points` | Точки / Кропкі |
+| Vehicles | `Vehicle`, `VehicleListViewModel`, `Views/Vehicles/` | `APIClient+Cars.swift` | `cars` | `Cars` | Машины / Машыны |
+
+The trips row is identical in both languages, and that is correct, not an untranslated
+placeholder: «маршрут» is the same word in Russian and Belarusian. The catalog is consistent
+about it — `Failed to load trips` and the `%lld trips` plurals all build on «маршрут», not
+«паездка» — so changing any one of them means changing all three.
+
+The vehicles row is the one that diverges at every level: the type is `Vehicle`, the endpoint
+is `cars`, and the UI says `Cars` → «Машины». **This is deliberate — don't "fix" it by renaming
+one layer to match another.** Renaming the types is its own task, and it would have to cover
+`Vehicle`, `VehicleListViewModel`, `VehicleDetailViewModel`, `VehicleCardView`,
+`VehicleListView`, `VehicleDetailView`, `VehicleSchedule`, `VehiclePhoto`, `VehicleOwner`, and
+`Views/Vehicles/` all at once.
+
+There is deliberately **no `Vehicles` catalog key**. The tab item (`ContentView`), the list
+screen title (`VehicleListView`), and the trip-detail section heading (`TripDetailView`) all
+share the single `Cars` key, so the wording can never drift between them. Adding a second key
+for any of those three would reintroduce exactly that drift.
+
+Sharing a key only protects the strings that share it, though — the *other* car-related
+strings are separate keys and have to be kept in vocabulary by hand. `Failed to load vehicles`,
+`No cars linked to this trip yet`, and `There aren't any trips with this car right now` all say
+«машина»/«машына» to match `Cars`; they previously said «автомобиль»/«аўтамабіль». Note the
+gender agreement travels with the noun — «ни одна машина», not «ни один автомобиль».
 
 View file naming is also not uniform: `TripListView` and `VehicleListView`, but `PointsView`.
 
@@ -135,8 +191,14 @@ View file naming is also not uniform: `TripListView` and `VehicleListView`, but 
 - `APIClient.get`/`post` handle auth headers centrally; `perform(_:)` maps status codes and
   decode failures to `APIError`. New endpoint functions build a URL and return
   `try await get(url:)` — no error handling of their own.
-- Endpoints returning localized text take `locale: String = "ru"` and forward it as a query
-  param.
+- Endpoints returning localized text take `locale: String = AppLanguage.current.apiLocale` and
+  forward it as a query param, so API content follows the app's language. Default argument
+  values are evaluated per call site, which is what keeps this dynamic. Only `ru` and `be` are
+  real: `locale=en` is accepted but silently returns Russian.
+  - `AppLanguage` is `nonisolated` for exactly this reason — default argument values are
+    evaluated in a nonisolated context, and `SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor` would
+    otherwise make reading it a concurrency violation.
+  - Known backend gap: `attraction-types` returns Russian names even for `locale=be`.
 - **Response envelopes are not uniform — check, don't assume.** Three shapes are in use:
   paginated lists return `{"data": [...], "meta": {...}}` (`PaginatedResponse<T>`); single
   resources and *some* collections return `{"data": ...}` (`SingleResponse<T>`, including

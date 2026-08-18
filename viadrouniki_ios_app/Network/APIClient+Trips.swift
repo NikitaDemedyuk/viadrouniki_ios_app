@@ -8,7 +8,7 @@ enum SortOrder: String {
 extension APIClient {
     func fetchTrip(
         slug: String,
-        locale: String = "ru"
+        locale: String = AppLanguage.current.apiLocale
     ) async throws -> Trip {
         let url = baseURL
             .appending(path: "trips/slug/\(slug)")
@@ -21,7 +21,7 @@ extension APIClient {
 
     func fetchTripCars(
         id: Int,
-        locale: String = "ru"
+        locale: String = AppLanguage.current.apiLocale
     ) async throws -> [TripCar] {
         let url = baseURL
             .appending(path: "trips/\(id)/cars")
@@ -36,7 +36,7 @@ extension APIClient {
         page: Int = 1,
         perPage: Int = 18,
         sortOrder: SortOrder = .desc,
-        locale: String = "ru"
+        locale: String = AppLanguage.current.apiLocale
     ) async throws -> PaginatedResponse<Trip> {
         let url = baseURL
             .appending(path: "trips")

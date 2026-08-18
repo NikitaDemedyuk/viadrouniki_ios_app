@@ -16,7 +16,7 @@ struct ContentView: View {
                 .tag(1)
 
             VehicleListView()
-                .tabItem { Label("Vehicles", systemImage: "car") }
+                .tabItem { Label("Cars", systemImage: "car") }
                 .tag(2)
 
             if appViewModel.isLoggedIn {

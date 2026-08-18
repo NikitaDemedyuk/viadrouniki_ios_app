@@ -7,7 +7,7 @@ struct VehicleListView: View {
         @Bindable var viewModel = viewModel
         NavigationStack {
             content
-                .navigationTitle("Vehicles")
+                .navigationTitle("Cars")
                 .navigationDestination(for: Vehicle.self) { vehicle in
                     VehicleDetailView(vehicle: vehicle)
                 }

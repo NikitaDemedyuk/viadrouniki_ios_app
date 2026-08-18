@@ -51,7 +51,8 @@ struct PointsView: View {
                 Image(systemName: displayMode == .list ? "map" : "list.bullet")
             }
             .accessibilityLabel(
-                displayMode == .list ? "Switch to map" : "Switch to list"
+                displayMode == .list
+                    ? Text("Switch to map") : Text("Switch to list")
             )
         }
     }
@@ -73,10 +74,9 @@ struct PointsView: View {
             ContentUnavailableView(
                 "No points found",
                 systemImage: "mappin.slash",
-                description: Text(
-                    viewModel.searchText.isEmpty
-                        ? "No points available" : "Try a different search"
-                )
+                description: viewModel.searchText.isEmpty
+                    ? Text("No points available")
+                    : Text("Try a different search")
             )
         } else {
             pointList
@@ -105,6 +105,9 @@ struct PointsView: View {
                 {
                     let attractionType = viewModel.attractionType(for: point)
                     Marker(
+                        // A `String` expression, so this takes Marker's
+                        // StringProtocol overload and is never looked up in the
+                        // catalog — correct, the API already localized it.
                         point.name ?? "",
                         coordinate: CLLocationCoordinate2D(
                             latitude: lat,
