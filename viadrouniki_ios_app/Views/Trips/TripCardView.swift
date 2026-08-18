@@ -4,6 +4,9 @@ struct TripCardView: View {
     let trip: Trip
 
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    /// `formatted(_:)` returns a plain `String`, so it would otherwise use
+    /// `Locale.current` (the device) instead of the app's selected language.
+    @Environment(\.locale) private var locale
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -71,16 +74,17 @@ struct TripCardView: View {
     }
 
     private var formattedDate: String {
+        let dayMonthYear = Date.FormatStyle.dateTime.day().month(.abbreviated).year().locale(locale)
         guard let end = trip.endDate,
             !Calendar.current.isDate(end, inSameDayAs: trip.startDate)
         else {
-            return trip.startDate.formatted(.dateTime.day().month(.abbreviated).year())
+            return trip.startDate.formatted(dayMonthYear)
         }
         let sameYear = Calendar.current.isDate(trip.startDate, equalTo: end, toGranularity: .year)
         let start = sameYear
-            ? trip.startDate.formatted(.dateTime.day().month(.abbreviated))
-            : trip.startDate.formatted(.dateTime.day().month(.abbreviated).year())
-        return "\(start) – \(end.formatted(.dateTime.day().month(.abbreviated).year()))"
+            ? trip.startDate.formatted(.dateTime.day().month(.abbreviated).locale(locale))
+            : trip.startDate.formatted(dayMonthYear)
+        return "\(start) – \(end.formatted(dayMonthYear))"
     }
 
 }

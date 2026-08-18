@@ -2,6 +2,9 @@ import SwiftUI
 
 struct TripListView: View {
     @State private var viewModel = TripListViewModel()
+    /// The API `locale` is part of the request, so a language change
+    /// invalidates what's on screen — re-running the fetch is what replaces it.
+    @Environment(\.locale) private var locale
 
     var body: some View {
         NavigationStack {
@@ -12,7 +15,7 @@ struct TripListView: View {
                 }
                 .refreshable { await viewModel.fetchInitial() }
         }
-        .task { await viewModel.fetchInitial() }
+        .task(id: locale) { await viewModel.fetchInitial() }
     }
 
     @ViewBuilder

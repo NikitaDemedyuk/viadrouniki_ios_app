@@ -6,6 +6,9 @@ struct VehicleDetailView: View {
     @State private var viewModel = VehicleDetailViewModel()
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @Environment(\.openURL) private var openURL
+    /// The API `locale` is part of the request, so a language change
+    /// invalidates what's on screen — re-running the fetch is what replaces it.
+    @Environment(\.locale) private var locale
 
     private var displayedVehicle: Vehicle {
         viewModel.vehicle ?? vehicle
@@ -46,7 +49,7 @@ struct VehicleDetailView: View {
         .navigationDestination(for: Trip.self) { trip in
             TripDetailView(trip: trip)
         }
-        .task {
+        .task(id: locale) {
             async let fetchVehicle: Void = viewModel.fetch(id: vehicle.id)
             async let fetchTrips: Void = viewModel.fetchTrips(vehicleId: vehicle.id)
             _ = await (fetchVehicle, fetchTrips)

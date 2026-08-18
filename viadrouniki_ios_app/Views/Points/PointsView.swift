@@ -6,11 +6,20 @@ private enum DisplayMode: String {
     case list, map
 }
 
+/// What the points request depends on. Keyed as a single value so a change to
+/// either input re-runs the fetch exactly once, rather than two `.task`s racing
+/// to call `fetchInitial()`.
+private struct PointsRequest: Equatable {
+    let search: String
+    let locale: Locale
+}
+
 struct PointsView: View {
     @State private var viewModel = PointListViewModel()
     @State private var displayMode: DisplayMode = .list
     @State private var selectedMapPoint: PointMapItem?
     @State private var isFilterPresented = false
+    @Environment(\.locale) private var locale
 
     var body: some View {
         @Bindable var viewModel = viewModel
@@ -34,7 +43,7 @@ struct PointsView: View {
                 PointDetailView(point: point)
             }
         }
-        .task(id: viewModel.searchText) {
+        .task(id: PointsRequest(search: viewModel.searchText, locale: locale)) {
             if !viewModel.searchText.isEmpty {
                 try? await Task.sleep(for: .milliseconds(400))
             }
@@ -51,7 +60,8 @@ struct PointsView: View {
                 Image(systemName: displayMode == .list ? "map" : "list.bullet")
             }
             .accessibilityLabel(
-                displayMode == .list ? "Switch to map" : "Switch to list"
+                displayMode == .list
+                    ? Text("Switch to map") : Text("Switch to list")
             )
         }
     }
@@ -73,10 +83,9 @@ struct PointsView: View {
             ContentUnavailableView(
                 "No points found",
                 systemImage: "mappin.slash",
-                description: Text(
-                    viewModel.searchText.isEmpty
-                        ? "No points available" : "Try a different search"
-                )
+                description: viewModel.searchText.isEmpty
+                    ? Text("No points available")
+                    : Text("Try a different search")
             )
         } else {
             pointList
@@ -105,6 +114,9 @@ struct PointsView: View {
                 {
                     let attractionType = viewModel.attractionType(for: point)
                     Marker(
+                        // A `String` expression, so this takes Marker's
+                        // StringProtocol overload and is never looked up in the
+                        // catalog — correct, the API already localized it.
                         point.name ?? "",
                         coordinate: CLLocationCoordinate2D(
                             latitude: lat,
@@ -117,7 +129,7 @@ struct PointsView: View {
             }
         }
         .ignoresSafeArea(edges: .bottom)
-        .task { await viewModel.fetchMapPoints() }
+        .task(id: locale) { await viewModel.fetchMapPoints() }
         .navigationDestination(item: $selectedMapPoint) { mapPoint in
             PointDetailView(point: Point(mapItem: mapPoint))
         }

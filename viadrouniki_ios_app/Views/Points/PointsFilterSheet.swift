@@ -21,7 +21,7 @@ struct PointsFilterSheet: View {
                 Section {
                     ForEach(attractionCategories) { row(for: $0) }
                     row(
-                        title: "Unknown type",
+                        title: Text("Unknown type"),
                         symbol: "questionmark",
                         color: .gray,
                         isSelected: selectedFilterKeys.contains(.unknown)
@@ -65,7 +65,9 @@ struct PointsFilterSheet: View {
 
     private func row(for type: AttractionType) -> some View {
         row(
-            title: type.name,
+            // Verbatim: the API already returns this name in the requested locale,
+            // so it must not be looked up in the catalog.
+            title: Text(verbatim: type.name),
             symbol: type.sfSymbolName,
             color: type.parsedColor ?? .gray,
             isSelected: selectedFilterKeys.contains(.type(type.id))
@@ -75,7 +77,7 @@ struct PointsFilterSheet: View {
     }
 
     private func row(
-        title: String,
+        title: Text,
         symbol: String,
         color: Color,
         isSelected: Bool,
@@ -91,7 +93,7 @@ struct PointsFilterSheet: View {
                             .font(.subheadline)
                             .foregroundStyle(.white)
                     }
-                Text(title)
+                title
                     .foregroundStyle(.primary)
                 Spacer()
                 if isSelected {

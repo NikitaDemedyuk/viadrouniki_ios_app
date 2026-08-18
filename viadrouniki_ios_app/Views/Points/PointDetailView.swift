@@ -5,6 +5,9 @@ struct PointDetailView: View {
 
     @State private var viewModel = PointDetailViewModel()
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    /// The API `locale` is part of the request, so a language change
+    /// invalidates what's on screen — re-running the fetch is what replaces it.
+    @Environment(\.locale) private var locale
 
     private var displayedPoint: Point {
         viewModel.point ?? point
@@ -46,7 +49,7 @@ struct PointDetailView: View {
         .navigationDestination(for: Trip.self) { trip in
             TripDetailView(trip: trip)
         }
-        .task {
+        .task(id: locale) {
             async let fetchPoint: Void = viewModel.fetch(slug: point.slug)
             async let fetchTrips: Void = viewModel.fetchTrips(slug: point.slug)
             _ = await (fetchPoint, fetchTrips)

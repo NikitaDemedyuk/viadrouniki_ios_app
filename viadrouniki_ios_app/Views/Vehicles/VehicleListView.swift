@@ -1,13 +1,25 @@
 import SwiftUI
 
+/// What the cars request depends on. Keyed as a single value so a change to any
+/// input re-runs the fetch exactly once — the sort field and order previously
+/// had a `.task` each, which meant two `fetchInitial()` calls on every appear.
+private struct VehiclesRequest: Equatable {
+    let sortField: CarSortField
+    let sortOrder: SortOrder
+    let locale: Locale
+}
+
 struct VehicleListView: View {
     @State private var viewModel = VehicleListViewModel()
+    /// The API `locale` is part of the request, so a language change
+    /// invalidates what's on screen — re-running the fetch is what replaces it.
+    @Environment(\.locale) private var locale
 
     var body: some View {
         @Bindable var viewModel = viewModel
         NavigationStack {
             content
-                .navigationTitle("Vehicles")
+                .navigationTitle("Cars")
                 .navigationDestination(for: Vehicle.self) { vehicle in
                     VehicleDetailView(vehicle: vehicle)
                 }
@@ -38,8 +50,13 @@ struct VehicleListView: View {
                     }
                 }
         }
-        .task(id: viewModel.sortField) { await viewModel.fetchInitial() }
-        .task(id: viewModel.sortOrder) { await viewModel.fetchInitial() }
+        .task(
+            id: VehiclesRequest(
+                sortField: viewModel.sortField,
+                sortOrder: viewModel.sortOrder,
+                locale: locale
+            )
+        ) { await viewModel.fetchInitial() }
     }
 
     @ViewBuilder

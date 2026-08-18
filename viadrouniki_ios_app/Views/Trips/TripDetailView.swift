@@ -5,6 +5,9 @@ struct TripDetailView: View {
 
     @State private var viewModel = TripDetailViewModel()
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    /// `formatted(_:)` returns a plain `String`, so it would otherwise use
+    /// `Locale.current` (the device) instead of the app's selected language.
+    @Environment(\.locale) private var locale
 
     private var displayedTrip: Trip {
         viewModel.trip ?? trip
@@ -48,7 +51,7 @@ struct TripDetailView: View {
         }
         .navigationTitle(displayedTrip.title)
         .navigationBarTitleDisplayMode(.inline)
-        .task {
+        .task(id: locale) {
             async let fetchTrip: Void = viewModel.fetch(slug: trip.slug)
             async let fetchCars: Void = viewModel.fetchCars(tripId: trip.id)
             _ = await (fetchTrip, fetchCars)
@@ -98,16 +101,17 @@ struct TripDetailView: View {
     }
 
     private var formattedDateRange: String {
+        let dayMonthYear = Date.FormatStyle.dateTime.day().month(.abbreviated).year().locale(locale)
         guard let end = displayedTrip.endDate,
             !Calendar.current.isDate(end, inSameDayAs: displayedTrip.startDate)
         else {
-            return displayedTrip.startDate.formatted(.dateTime.day().month(.abbreviated).year())
+            return displayedTrip.startDate.formatted(dayMonthYear)
         }
         let sameYear = Calendar.current.isDate(displayedTrip.startDate, equalTo: end, toGranularity: .year)
         let start = sameYear
-            ? displayedTrip.startDate.formatted(.dateTime.day().month(.abbreviated))
-            : displayedTrip.startDate.formatted(.dateTime.day().month(.abbreviated).year())
-        return "\(start) – \(end.formatted(.dateTime.day().month(.abbreviated).year()))"
+            ? displayedTrip.startDate.formatted(.dateTime.day().month(.abbreviated).locale(locale))
+            : displayedTrip.startDate.formatted(dayMonthYear)
+        return "\(start) – \(end.formatted(dayMonthYear))"
     }
 
     private var meetingSection: some View {
@@ -134,7 +138,7 @@ struct TripDetailView: View {
         guard let time = Self.meetingTimeParser.date(from: displayedTrip.meetingTime) else {
             return displayedTrip.meetingTime
         }
-        return time.formatted(.dateTime.hour().minute())
+        return time.formatted(.dateTime.hour().minute().locale(locale))
     }
 
     private func descriptionSection(_ text: String) -> some View {

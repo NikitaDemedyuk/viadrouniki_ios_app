@@ -3,7 +3,7 @@ import Foundation
 extension APIClient {
     func fetchAttraction(
         slug: String,
-        locale: String = "ru"
+        locale: String = AppLanguage.current.apiLocale
     ) async throws -> Point {
         let url =
             baseURL
@@ -19,7 +19,7 @@ extension APIClient {
         slug: String,
         page: Int = 1,
         perPage: Int = 15,
-        locale: String = "ru"
+        locale: String = AppLanguage.current.apiLocale
     ) async throws -> PaginatedResponse<Trip> {
         let url =
             baseURL
@@ -36,7 +36,7 @@ extension APIClient {
         page: Int,
         perPage: Int = 20,
         search: String = "",
-        locale: String = "ru",
+        locale: String = AppLanguage.current.apiLocale,
         isActive: String = "active"
     ) async throws -> PaginatedResponse<Point> {
         var queryItems: [URLQueryItem] = [
@@ -56,7 +56,7 @@ extension APIClient {
     }
 
     func fetchAttractionsMap(
-        locale: String = "ru",
+        locale: String = AppLanguage.current.apiLocale,
         isActive: String = "active"
     ) async throws -> [PointMapItem] {
         let url =
@@ -69,7 +69,7 @@ extension APIClient {
         return try await get(url: url)
     }
 
-    func fetchAttractionTypes(locale: String = "ru") async throws -> [AttractionType] {
+    func fetchAttractionTypes(locale: String = AppLanguage.current.apiLocale) async throws -> [AttractionType] {
         let url =
             baseURL
                 .appending(path: "attraction-types")
