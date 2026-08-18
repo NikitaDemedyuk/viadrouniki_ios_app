@@ -81,9 +81,25 @@ View (SwiftUI struct)
   `ViadrounikiApp` forces it onto the tree with `.environment(\.locale,)`. That one modifier is
   what localizes every `LocalizedStringKey` — `Text`, `Label`, `.navigationTitle`, `Button`,
   `Picker`, `ContentUnavailableView`, `.searchable(prompt:)` — with no per-call-site work.
-  - The same root also carries `.id(appViewModel.language)`, which rebuilds the tree on a
-    language change so ViewModels are recreated and their `.task`s refetch API content in the
-    new locale. Don't remove it: without it the UI flips language but the data stays stale.
+  - That modifier only covers catalog strings. **API content is a separate problem**: the
+    `locale` query param is baked into responses already held by ViewModels, so a language
+    change has to refetch. Every screen that loads content keys its `.task` on
+    `@Environment(\.locale)` — `TripListView`, `PointsView` (list *and* map), `VehicleListView`,
+    and all three detail views. **A new fetching screen must do the same, or it will keep
+    showing the previous language until something else happens to reload it.**
+    - Where a `.task` already had a key, the language joins it in one `Equatable` struct
+      (`PointsRequest`, `VehiclesRequest`) rather than becoming a second `.task` — two tasks
+      calling the same fetch both fire on appear and race, with only the `isLoading` guard
+      keeping it to one request.
+    - Pagination `.task`s (`fetchMoreIfNeeded`) stay unkeyed. They're per-row and the reload
+      replaces the whole list anyway.
+    - `PointListViewModel.fetchMapPoints()` is the one guarded load, because the map's `.task`
+      re-runs whenever the map reappears. It stamps `loadedMapLocale` on success, so a
+      list↔map toggle doesn't refetch but a language change does. Guarding on
+      `mapPoints.isEmpty` instead — the obvious version — silently blocks the language refetch.
+    - Doing this with `.id(appViewModel.language)` at the root also works and is shorter, but
+      it refetches by destroying the tree: every `NavigationStack` path and scroll position
+      goes with it. It was the original approach; don't reintroduce it.
   - **Anything resolved outside SwiftUI does not see that environment value** and must be
     pointed at the language explicitly. `Locale.current` is the *device* language and is
     essentially always wrong here.

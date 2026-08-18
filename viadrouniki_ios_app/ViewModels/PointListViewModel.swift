@@ -20,6 +20,13 @@ final class PointListViewModel {
     private var hasMorePages = true
     private var isFetchingMore = false
     private var lastFetchedSearch: String = ""
+    /// The API locale `mapPoints` was fetched for, set only on success.
+    ///
+    /// The map's `.task` re-runs every time the map reappears, so something has
+    /// to stop a list↔map toggle from refetching. Guarding on `mapPoints.isEmpty`
+    /// did that but also blocked the refetch a language change needs — and
+    /// treated "loaded, but the server returned nothing" as "never loaded".
+    private var loadedMapLocale: String?
 
     func fetchInitial() async {
         isFetchingMore = false
@@ -68,7 +75,8 @@ final class PointListViewModel {
     }
 
     func fetchMapPoints() async {
-        guard mapPoints.isEmpty, !isLoadingMap else { return }
+        let locale = AppLanguage.current.apiLocale
+        guard loadedMapLocale != locale, !isLoadingMap else { return }
         isLoadingMap = true
         mapErrorMessage = nil
 
@@ -87,6 +95,7 @@ final class PointListViewModel {
             )
             selectedFilterKeys = types.defaultSelectedFilterKeys
             mapPoints = points
+            loadedMapLocale = locale
         } catch {
             mapErrorMessage = error.presentableMessage
         }

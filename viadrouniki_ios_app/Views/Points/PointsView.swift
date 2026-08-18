@@ -6,11 +6,20 @@ private enum DisplayMode: String {
     case list, map
 }
 
+/// What the points request depends on. Keyed as a single value so a change to
+/// either input re-runs the fetch exactly once, rather than two `.task`s racing
+/// to call `fetchInitial()`.
+private struct PointsRequest: Equatable {
+    let search: String
+    let locale: Locale
+}
+
 struct PointsView: View {
     @State private var viewModel = PointListViewModel()
     @State private var displayMode: DisplayMode = .list
     @State private var selectedMapPoint: PointMapItem?
     @State private var isFilterPresented = false
+    @Environment(\.locale) private var locale
 
     var body: some View {
         @Bindable var viewModel = viewModel
@@ -34,7 +43,7 @@ struct PointsView: View {
                 PointDetailView(point: point)
             }
         }
-        .task(id: viewModel.searchText) {
+        .task(id: PointsRequest(search: viewModel.searchText, locale: locale)) {
             if !viewModel.searchText.isEmpty {
                 try? await Task.sleep(for: .milliseconds(400))
             }
@@ -120,7 +129,7 @@ struct PointsView: View {
             }
         }
         .ignoresSafeArea(edges: .bottom)
-        .task { await viewModel.fetchMapPoints() }
+        .task(id: locale) { await viewModel.fetchMapPoints() }
         .navigationDestination(item: $selectedMapPoint) { mapPoint in
             PointDetailView(point: Point(mapItem: mapPoint))
         }

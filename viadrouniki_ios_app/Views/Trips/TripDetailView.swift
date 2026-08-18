@@ -51,7 +51,7 @@ struct TripDetailView: View {
         }
         .navigationTitle(displayedTrip.title)
         .navigationBarTitleDisplayMode(.inline)
-        .task {
+        .task(id: locale) {
             async let fetchTrip: Void = viewModel.fetch(slug: trip.slug)
             async let fetchCars: Void = viewModel.fetchCars(tripId: trip.id)
             _ = await (fetchTrip, fetchCars)
