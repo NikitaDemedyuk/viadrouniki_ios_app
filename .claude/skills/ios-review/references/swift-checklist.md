@@ -3,7 +3,8 @@
 Project constants live in `CLAUDE.md` (repo root). Short version for this checklist:
 iOS 26.5 target, **Swift 5 language mode with `minimal` strict concurrency**,
 `SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor`, MVVM + `@Observable`, SwiftUI only,
-no service/DI layer, no test target, no localization catalog.
+no service/DI layer, no test target, localized in Russian + Belarusian via
+`Localizable.xcstrings` (source language English, and no English UI ships).
 
 ## Contents
 1. Architecture & layering
@@ -13,6 +14,7 @@ no service/DI layer, no test target, no localization catalog.
 5. Generated-code hazards
 6. Testing (no test target — read before flagging)
 7. Naming & style
+8. Localization (ru + be — compiler-invisible, read before flagging or approving)
 
 ---
 
@@ -88,10 +90,11 @@ View body rules:
 - [ ] View bodies over ~50 lines: suggest extracting subviews or computed properties. (Flutter mapping: same instinct as splitting a giant `build()` into widgets.)
 - [ ] Navigation uses `NavigationStack` with typed paths, not deprecated `NavigationView`.
 - [ ] Deployment target is iOS 26.5, so current APIs are available unconditionally and availability checks are almost never needed — flag `if #available` guards for anything already covered by the target. Note that some existing code predates this and still uses older equivalents (`ContentView`'s `.tabItem`/`.tag` rather than `Tab`); modernizing it is a deliberate task, not something to demand in an unrelated review.
-- [ ] **Do not flag hardcoded UI strings.** The project has no localization catalog (`CLAUDE.md`);
-      English literals inline in Views are the convention, and the `locale: "ru"` query param
-      only governs API content. Raising this means raising every View in the project. It becomes
-      a real check once a catalog exists — not before.
+- [ ] **Localization** — see §8. Short version for View review: an English literal inline in a
+      View is correct (English is the catalog's source language, so the literal *is* the key),
+      but a literal with no `Localizable.xcstrings` entry, a fetching screen whose `.task` isn't
+      keyed on `@Environment(\.locale)`, and a `String`-typed argument that silently misses the
+      `LocalizedStringKey` overload are all real findings.
 
 ## §4 Swift language & memory
 
@@ -178,3 +181,80 @@ implementation details, no `sleep`-based synchronization.
 - [ ] One primary type per file; file named after the type.
 - [ ] No Flutter-isms leaking in: no `build()` helper methods returning views (use computed `var` or subviews), no `Widget`-style deeply nested initializer trees when modifiers do the job.
 - [ ] `// MARK: -` sections in files over ~100 lines.
+
+## §8 Localization
+
+The app ships **Russian and Belarusian** (`Localizable.xcstrings` at the root of the source
+folder) and **no English UI**. English is the catalog's *source language*, so UI strings stay
+written as English literals inline in Views — the literal is the key.
+
+Read this section before approving anything that adds user-facing text or a fetching screen.
+None of the failures below are caught by the compiler or visible in a green build: they show
+up as English text on a Russian screen, or as a screen stuck in the language the user just
+switched away from.
+
+**Catalog coverage**
+- [ ] Every new user-facing literal has an `Localizable.xcstrings` entry with **both** `ru`
+      and `be`. A missing entry falls back to the English key and renders English to a user
+      who will never see an English UI. Verify rather than eyeball — the catalog is JSON:
+      ```bash
+      python3 -c "
+      import json; d = json.load(open('viadrouniki_ios_app/Localizable.xcstrings'))
+      for k, v in d['strings'].items():
+          if v.get('shouldTranslate') is False: continue
+          missing = {'ru', 'be'} - set(v.get('localizations', {}))
+          if missing: print(sorted(missing), repr(k))
+      "
+      ```
+      Entries marked `shouldTranslate: false` are pure format strings (`\"%@ · %@\"`) and are
+      *supposed* to have no translations — skipping them is why the filter is there, not an
+      oversight to fix.
+- [ ] Vocabulary matches the existing catalog rather than being freshly invented. Cars are
+      «машина»/«машына» (not «аўтамабіль»), trips are «маршрут» in both languages. Gender
+      agreement travels with the noun: «ни одна машина», not «ни один автомобиль».
+- [ ] No second catalog key for something an existing key already covers. The tab item, the
+      Cars list title, and the trip-detail section heading deliberately share one `Cars` key
+      so the wording can't drift; adding a parallel key reintroduces the drift. See `CLAUDE.md`.
+
+**Language changes must reach the network layer**
+- [ ] A new screen that *fetches* keys its `.task` on `@Environment(\.locale)`. The `locale`
+      query param is baked into responses the ViewModel already holds, so `.environment(\.locale,)`
+      alone cannot fix them — without the key the screen keeps serving the previous language
+      until something unrelated reloads it. 🟡.
+- [ ] Where a `.task` already had an id, the language joins it in the **same** `Equatable`
+      struct (`PointsRequest`, `VehiclesRequest`) — a second `.task` is a 🟡: both fire on
+      appear and race, with only the `isLoading` guard keeping it to one request.
+- [ ] Row-level pagination `.task`s (`fetchMoreIfNeeded`) stay **unkeyed**. Don't ask for a key
+      there; the reload replaces the whole list anyway.
+- [ ] `.id(appViewModel.language)` at the root is a 🔴 regression, not a shortcut — it refetches
+      by destroying the tree, taking every `NavigationStack` path and scroll position with it.
+      That was the original approach and it was deliberately replaced.
+- [ ] A guarded load that stamps what it loaded (`PointListViewModel.loadedMapLocale`) guards on
+      the **locale**, not on `collection.isEmpty`. The `isEmpty` version is the obvious one and
+      it silently blocks the language refetch.
+
+**Outside SwiftUI, the environment does not reach you**
+- [ ] `String(localized:)` in a Model, ViewModel, or Network file passes
+      `bundle: AppLanguage.current.bundle`. This is the single easiest thing to get wrong here:
+      `locale:` only formats interpolated values — the *translation lookup* goes through the
+      device's preferred localization and ignores it entirely. With the device in English,
+      `String(localized: "Hello", locale: Locale(identifier: "ru"))` returns the **Belarusian**
+      string. Keep `locale:` too, for interpolated numbers and dates. See `APIError`,
+      `VehicleSchedule.label`.
+- [ ] `Locale.current` is the *device* language and is essentially always wrong in this project
+      — iOS has no Belarusian display language at all. Expect `AppLanguage.current.locale`, or
+      `@Environment(\.locale)` inside a View.
+- [ ] `Date` format styles pass `.locale(_:)` (see `TripCardView`). For these, unlike
+      `String(localized:)`, `locale` alone is sufficient.
+
+**Overload resolution silently opts out**
+- [ ] A literal only localizes where the parameter is a `LocalizedStringKey`. A `String`
+      variable, or a ternary of two literals, binds to the `StringProtocol` overload instead
+      and renders verbatim. Fix by passing `Text` (see `PointsFilterSheet.row(title:)`,
+      `PointsView`). This compiles cleanly either way, so it has to be read for.
+- [ ] Conversely, API-supplied text is **already** localized by the server and must not be run
+      through a lookup — doing so produces a miss and echoes the string back by luck, not design.
+
+**Known backend gap, not an app bug**
+- [ ] `attraction-types` returns Russian names even for `locale=be`. Don't file it against the
+      diff under review; it's recorded in `CLAUDE.md`.
