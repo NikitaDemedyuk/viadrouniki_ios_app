@@ -70,9 +70,16 @@ do it before assigning severity rather than guessing at the ceiling.
 
 Do **not** raise `APIClient.shared` used directly from a ViewModel as a finding at any level. It is the established convention in all six ViewModels and is documented in `CLAUDE.md`. Flagging it means flagging every file in the project, which is noise, not review.
 
-Likewise, do not raise hardcoded English UI strings. The project has no localization catalog
-at all — that is recorded in `CLAUDE.md` as the current convention, so flagging it is flagging
-every View in the project.
+Likewise, do not raise hardcoded English UI strings *by themselves*. The app **is** localized
+(Russian + Belarusian, `Localizable.xcstrings`), and English is the catalog's **source
+language** — so an English literal inline in a View is the lookup key, not an oversight. There
+is deliberately no English UI. Flagging the literal is flagging every View in the project.
+
+What *is* worth flagging is the localization actually breaking: a new literal with no catalog
+entry, a fetching screen whose `.task` isn't keyed on the language, or `String(localized:)`
+without `bundle:`. None of these fail at compile time and none are visible in a green build —
+they show up as English text on screen, or as a screen stuck in the previous language. See
+**§8** of the checklist, which is the highest-value section after §2 for exactly that reason.
 
 Do not pad reviews. If code is clean, say so in two sentences and stop. Never invent findings to appear thorough.
 
