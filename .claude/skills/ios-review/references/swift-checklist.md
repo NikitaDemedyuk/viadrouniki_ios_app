@@ -220,7 +220,7 @@ switched away from.
 - [ ] A new screen that *fetches* keys its `.task` on `@Environment(\.locale)`. The `locale`
       query param is baked into responses the ViewModel already holds, so `.environment(\.locale,)`
       alone cannot fix them — without the key the screen keeps serving the previous language
-      until something unrelated reloads it. 🟡, or 🔴 if the screen is a main tab.
+      until something unrelated reloads it. 🟡.
 - [ ] Where a `.task` already had an id, the language joins it in the **same** `Equatable`
       struct (`PointsRequest`, `VehiclesRequest`) — a second `.task` is a 🟡: both fire on
       appear and race, with only the `isLoading` guard keeping it to one request.
