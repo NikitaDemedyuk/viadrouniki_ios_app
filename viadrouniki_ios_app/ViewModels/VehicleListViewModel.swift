@@ -13,11 +13,16 @@ final class VehicleListViewModel {
     private var currentPage = 1
     private var hasMorePages = true
     private var isFetchingMore = false
+    private var loadGeneration = 0
 
     func fetchInitial() async {
         guard !isLoading else { return }
         isLoading = true
+        defer { isLoading = false }
+
         isFetchingMore = false
+        loadGeneration += 1
+        let generation = loadGeneration
         errorMessage = nil
 
         do {
@@ -26,14 +31,14 @@ final class VehicleListViewModel {
                 sortBy: sortField,
                 sortOrder: sortOrder
             )
+            guard generation == loadGeneration else { return }
             vehicles = response.data
             currentPage = 1
             hasMorePages = response.meta.currentPage < response.meta.lastPage
         } catch {
+            guard generation == loadGeneration else { return }
             errorMessage = error.presentableMessage
         }
-
-        isLoading = false
     }
 
     func fetchMoreIfNeeded(currentVehicle: Vehicle) async {
@@ -42,6 +47,9 @@ final class VehicleListViewModel {
         else { return }
 
         isFetchingMore = true
+        defer { isFetchingMore = false }
+
+        let generation = loadGeneration
         let nextPage = currentPage + 1
 
         do {
@@ -50,13 +58,13 @@ final class VehicleListViewModel {
                 sortBy: sortField,
                 sortOrder: sortOrder
             )
+            guard generation == loadGeneration else { return }
             vehicles.append(contentsOf: response.data)
             currentPage = nextPage
             hasMorePages = response.meta.currentPage < response.meta.lastPage
         } catch {
+            guard generation == loadGeneration else { return }
             errorMessage = error.presentableMessage
         }
-
-        isFetchingMore = false
     }
 }
