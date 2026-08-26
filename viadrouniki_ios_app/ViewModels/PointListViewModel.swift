@@ -20,6 +20,7 @@ final class PointListViewModel {
     private var hasMorePages = true
     private var isFetchingMore = false
     private var loadGeneration = 0
+    private var isReloadPending = false
     private var lastFetchedSearch: String = ""
     /// The API locale `mapPoints` was fetched for, set only on success.
     ///
@@ -31,29 +32,35 @@ final class PointListViewModel {
     private var mapLoadGeneration = 0
 
     func fetchInitial() async {
-        guard !isLoading else { return }
+        guard !isLoading else {
+            isReloadPending = true
+            return
+        }
         isLoading = true
         defer { isLoading = false }
 
-        isFetchingMore = false
-        loadGeneration += 1
-        let generation = loadGeneration
-        errorMessage = nil
-        lastFetchedSearch = searchText
+        repeat {
+            isReloadPending = false
+            isFetchingMore = false
+            loadGeneration += 1
+            let generation = loadGeneration
+            errorMessage = nil
+            lastFetchedSearch = searchText
 
-        do {
-            let response = try await APIClient.shared.fetchAttractions(
-                page: 1,
-                search: searchText
-            )
-            guard generation == loadGeneration else { return }
-            points = response.data
-            currentPage = 1
-            hasMorePages = response.meta.currentPage < response.meta.lastPage
-        } catch {
-            guard generation == loadGeneration else { return }
-            errorMessage = error.presentableMessage
-        }
+            do {
+                let response = try await APIClient.shared.fetchAttractions(
+                    page: 1,
+                    search: searchText
+                )
+                guard generation == loadGeneration else { return }
+                points = response.data
+                currentPage = 1
+                hasMorePages = response.meta.currentPage < response.meta.lastPage
+            } catch {
+                guard generation == loadGeneration else { return }
+                errorMessage = error.presentableMessage
+            }
+        } while isReloadPending
     }
 
     func fetchMoreIfNeeded(currentPoint: Point) async {
