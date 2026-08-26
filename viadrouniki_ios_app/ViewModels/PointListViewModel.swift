@@ -19,6 +19,8 @@ final class PointListViewModel {
     private var currentPage = 1
     private var hasMorePages = true
     private var isFetchingMore = false
+    private var loadGeneration = 0
+    private var isReloadPending = false
     private var lastFetchedSearch: String = ""
     /// The API locale `mapPoints` was fetched for, set only on success.
     ///
@@ -27,27 +29,38 @@ final class PointListViewModel {
     /// did that but also blocked the refetch a language change needs — and
     /// treated "loaded, but the server returned nothing" as "never loaded".
     private var loadedMapLocale: String?
+    private var mapLoadGeneration = 0
 
     func fetchInitial() async {
-        isFetchingMore = false
-        guard !isLoading else { return }
-        isLoading = true
-        errorMessage = nil
-        lastFetchedSearch = searchText
-
-        do {
-            let response = try await APIClient.shared.fetchAttractions(
-                page: 1,
-                search: searchText
-            )
-            points = response.data
-            currentPage = 1
-            hasMorePages = response.meta.currentPage < response.meta.lastPage
-        } catch {
-            errorMessage = error.presentableMessage
+        guard !isLoading else {
+            isReloadPending = true
+            return
         }
+        isLoading = true
+        defer { isLoading = false }
 
-        isLoading = false
+        repeat {
+            isReloadPending = false
+            isFetchingMore = false
+            loadGeneration += 1
+            let generation = loadGeneration
+            errorMessage = nil
+            lastFetchedSearch = searchText
+
+            do {
+                let response = try await APIClient.shared.fetchAttractions(
+                    page: 1,
+                    search: searchText
+                )
+                guard generation == loadGeneration else { return }
+                points = response.data
+                currentPage = 1
+                hasMorePages = response.meta.currentPage < response.meta.lastPage
+            } catch {
+                guard generation == loadGeneration else { return }
+                errorMessage = error.presentableMessage
+            }
+        } while isReloadPending
     }
 
     func fetchMoreIfNeeded(currentPoint: Point) async {
@@ -56,6 +69,9 @@ final class PointListViewModel {
         else { return }
 
         isFetchingMore = true
+        defer { isFetchingMore = false }
+
+        let generation = loadGeneration
         let nextPage = currentPage + 1
 
         do {
@@ -63,21 +79,24 @@ final class PointListViewModel {
                 page: nextPage,
                 search: lastFetchedSearch
             )
-            guard isFetchingMore else { return }
+            guard generation == loadGeneration else { return }
             points.append(contentsOf: response.data)
             currentPage = nextPage
             hasMorePages = response.meta.currentPage < response.meta.lastPage
         } catch {
+            guard generation == loadGeneration else { return }
             errorMessage = error.presentableMessage
         }
-
-        isFetchingMore = false
     }
 
     func fetchMapPoints() async {
         let locale = AppLanguage.current.apiLocale
         guard loadedMapLocale != locale, !isLoadingMap else { return }
         isLoadingMap = true
+        defer { isLoadingMap = false }
+
+        mapLoadGeneration += 1
+        let generation = mapLoadGeneration
         mapErrorMessage = nil
 
         // Fetched together so markers are only ever built once already tinted:
@@ -87,6 +106,7 @@ final class PointListViewModel {
         do {
             let points = try await APIClient.shared.fetchAttractionsMap()
             let types = await typesTask
+            guard generation == mapLoadGeneration else { return }
             // `uniquingKeysWith:` rather than `uniqueKeysWithValues:`: the latter
             // traps on a duplicate id, which is server-controlled input.
             attractionTypesById = Dictionary(
@@ -97,10 +117,9 @@ final class PointListViewModel {
             mapPoints = points
             loadedMapLocale = locale
         } catch {
+            guard generation == mapLoadGeneration else { return }
             mapErrorMessage = error.presentableMessage
         }
-
-        isLoadingMap = false
     }
 
     /// Whether the filter affordance has anything to offer. False when the

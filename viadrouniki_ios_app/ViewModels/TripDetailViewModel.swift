@@ -12,27 +12,42 @@ final class TripDetailViewModel {
     var isLoadingCars = false
     var carsErrorMessage: String?
 
+    private var loadGeneration = 0
+    private var carsLoadGeneration = 0
+
     func fetch(slug: String) async {
         guard !isLoading else { return }
         isLoading = true
+        defer { isLoading = false }
+
+        loadGeneration += 1
+        let generation = loadGeneration
         errorMessage = nil
         do {
-            trip = try await APIClient.shared.fetchTrip(slug: slug)
+            let response = try await APIClient.shared.fetchTrip(slug: slug)
+            guard generation == loadGeneration else { return }
+            trip = response
         } catch {
+            guard generation == loadGeneration else { return }
             errorMessage = error.presentableMessage
         }
-        isLoading = false
     }
 
     func fetchCars(tripId: Int) async {
         guard !isLoadingCars else { return }
         isLoadingCars = true
+        defer { isLoadingCars = false }
+
+        carsLoadGeneration += 1
+        let generation = carsLoadGeneration
         carsErrorMessage = nil
         do {
-            cars = try await APIClient.shared.fetchTripCars(id: tripId)
+            let response = try await APIClient.shared.fetchTripCars(id: tripId)
+            guard generation == carsLoadGeneration else { return }
+            cars = response
         } catch {
+            guard generation == carsLoadGeneration else { return }
             carsErrorMessage = error.presentableMessage
         }
-        isLoadingCars = false
     }
 }

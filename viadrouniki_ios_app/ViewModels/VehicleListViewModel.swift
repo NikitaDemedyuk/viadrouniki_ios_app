@@ -13,27 +13,39 @@ final class VehicleListViewModel {
     private var currentPage = 1
     private var hasMorePages = true
     private var isFetchingMore = false
+    private var loadGeneration = 0
+    private var isReloadPending = false
 
     func fetchInitial() async {
-        guard !isLoading else { return }
-        isLoading = true
-        isFetchingMore = false
-        errorMessage = nil
-
-        do {
-            let response = try await APIClient.shared.fetchCars(
-                page: 1,
-                sortBy: sortField,
-                sortOrder: sortOrder
-            )
-            vehicles = response.data
-            currentPage = 1
-            hasMorePages = response.meta.currentPage < response.meta.lastPage
-        } catch {
-            errorMessage = error.presentableMessage
+        guard !isLoading else {
+            isReloadPending = true
+            return
         }
+        isLoading = true
+        defer { isLoading = false }
 
-        isLoading = false
+        repeat {
+            isReloadPending = false
+            isFetchingMore = false
+            loadGeneration += 1
+            let generation = loadGeneration
+            errorMessage = nil
+
+            do {
+                let response = try await APIClient.shared.fetchCars(
+                    page: 1,
+                    sortBy: sortField,
+                    sortOrder: sortOrder
+                )
+                guard generation == loadGeneration else { return }
+                vehicles = response.data
+                currentPage = 1
+                hasMorePages = response.meta.currentPage < response.meta.lastPage
+            } catch {
+                guard generation == loadGeneration else { return }
+                errorMessage = error.presentableMessage
+            }
+        } while isReloadPending
     }
 
     func fetchMoreIfNeeded(currentVehicle: Vehicle) async {
@@ -42,6 +54,9 @@ final class VehicleListViewModel {
         else { return }
 
         isFetchingMore = true
+        defer { isFetchingMore = false }
+
+        let generation = loadGeneration
         let nextPage = currentPage + 1
 
         do {
@@ -50,13 +65,13 @@ final class VehicleListViewModel {
                 sortBy: sortField,
                 sortOrder: sortOrder
             )
+            guard generation == loadGeneration else { return }
             vehicles.append(contentsOf: response.data)
             currentPage = nextPage
             hasMorePages = response.meta.currentPage < response.meta.lastPage
         } catch {
+            guard generation == loadGeneration else { return }
             errorMessage = error.presentableMessage
         }
-
-        isFetchingMore = false
     }
 }
