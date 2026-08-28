@@ -4,6 +4,7 @@ struct PointsFilterSheet: View {
     let attractionTypes: [AttractionType]
     @Binding var selectedFilterKeys: Set<PointFilterKey>
     @Environment(\.dismiss) private var dismiss
+    @Environment(AppViewModel.self) private var appViewModel
 
     /// Attractions first, amenities in their own section below; the "unknown
     /// type" row sits between the two groups, matching the web app's layout.
@@ -34,7 +35,8 @@ struct PointsFilterSheet: View {
                 }
             }
             .listStyle(.insetGrouped)
-            .navigationTitle("Filter Points")
+            // Pre-resolved off `appViewModel.language` — see `AppLanguage.localized(_:)`.
+            .navigationTitle(appViewModel.language.localized("Filter Points"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {

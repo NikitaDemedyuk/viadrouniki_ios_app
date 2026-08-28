@@ -79,8 +79,9 @@ View (SwiftUI struct)
   language, so it can't be selected in Settings and the per-app language picker can't offer it
   either. `AppLanguage` (UserDefaults-backed, defaults to Russian) is the source of truth, and
   `ViadrounikiApp` forces it onto the tree with `.environment(\.locale,)`. That one modifier is
-  what localizes every `LocalizedStringKey` — `Text`, `Label`, `.navigationTitle`, `Button`,
-  `Picker`, `ContentUnavailableView`, `.searchable(prompt:)` — with no per-call-site work.
+  what localizes every `LocalizedStringKey` — `Text`, `Button`, `Picker`, `ContentUnavailableView`,
+  `.searchable(prompt:)` — with no per-call-site work. **`.navigationTitle` and `.tabItem`'s
+  `Label` are the exception** — see below.
   - That modifier only covers catalog strings. **API content is a separate problem**: the
     `locale` query param is baked into responses already held by ViewModels, so a language
     change has to refetch. Every screen that loads content keys its `.task` on
@@ -111,6 +112,39 @@ View (SwiftUI struct)
       Belarusian string. **Pass `bundle: AppLanguage.current.bundle`** — that is what
       actually selects the language (see `APIError`, `VehicleSchedule.label`). Keep passing
       `locale:` too, for interpolated numbers and dates.
+  - **`.navigationTitle` and `.tabItem`'s `Label` do not reliably re-resolve a
+    `LocalizedStringKey` on an environment-only `\.locale` change, for whichever screen or
+    tab is currently on screen at the moment the language changes.** The key itself compares
+    equal, so SwiftUI has nothing to diff and the UIKit-bridged bar/tab item keeps showing
+    the previous language. This was first found on a *pushed* destination (`SettingsView`),
+    but is not limited to it — it also hits `ProfileView`'s own root title and its `.tabItem`
+    while `ProfileView` is the active tab. **Confirmed by A/B test, not inferred:** reverting
+    `ProfileView` to a plain `.navigationTitle("Profile")` and rebuilding reproduces a Russian
+    «Профиль» sitting above Belarusian list content and Belarusian tab items; restoring
+    `localized(_:)` removes it, in both switch directions. Worth knowing, because the rule
+    looks like superstition otherwise and invites someone to "simplify" it away. Plain
+    `Text`/`Label` content in a screen's body is unaffected and should keep using
+    `LocalizedStringKey` literals as normal.
+    - **Fix:** call `AppLanguage.localized(_:)` (in `Models/AppLanguage.swift`) at every
+      `.navigationTitle` and `.tabItem` `Label` — e.g. `appViewModel.language.localized("Settings")`.
+      It pre-resolves to a `String` off `AppViewModel.language`, a real `@Observable`
+      dependency, so the value handed to the modifier genuinely differs between languages
+      and `body` is forced to push the update through. See `SettingsView`, `ProfileView`,
+      `ContentView`.
+    - Do **not** fix it with `.id()` on a pushed destination — that changes its identity,
+      which `NavigationStack` reads as the destination disappearing, popping back to the
+      previous screen.
+    - **Every `.navigationTitle` and `.tabItem` `Label` in the app now goes through the
+      helper**, and a new one should too. `TripListView`, `PointsView`, `VehicleListView`, and
+      `PointsFilterSheet` were converted defensively rather than in response to a visible
+      break: the only language picker lives in `SettingsView` under the Profile tab, so those
+      four are always *backgrounded* when the language changes and backgrounded screens rebuild
+      correctly. That makes their conversion unverifiable today — it is non-regression, not a
+      demonstrated fix — but the mechanism is generic, not specific to `Profile`, and these are
+      the screens most likely to gain a language entry point later.
+    - Detail-screen titles that interpolate API text (`TripDetailView`, `PointDetailView`,
+      `VehicleDetailView`) need nothing: the server already localized that text, and it arrives
+      as a `String`, so there is no `LocalizedStringKey` to go stale.
   - A literal only localizes where the parameter is a `LocalizedStringKey`. A `String` variable
     or a ternary of two literals binds to the `StringProtocol` overload instead — pass `Text`
     (as `PointsFilterSheet.row(title:)` and `PointsView` do). Conversely, API-supplied text is

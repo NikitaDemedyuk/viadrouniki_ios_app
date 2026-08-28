@@ -20,6 +20,7 @@ struct PointsView: View {
     @State private var selectedMapPoint: PointMapItem?
     @State private var isFilterPresented = false
     @Environment(\.locale) private var locale
+    @Environment(AppViewModel.self) private var appViewModel
 
     var body: some View {
         @Bindable var viewModel = viewModel
@@ -30,7 +31,8 @@ struct PointsView: View {
                         .toolbar { displayModeButton }
                 } else {
                     content
-                        .navigationTitle("Points")
+                        // Pre-resolved off `appViewModel.language` — see `AppLanguage.localized(_:)`.
+                        .navigationTitle(appViewModel.language.localized("Points"))
                         .searchable(
                             text: $viewModel.searchText,
                             prompt: "Search points"
@@ -195,4 +197,5 @@ struct PointsView: View {
 
 #Preview {
     PointsView()
+        .environment(AppViewModel())
 }

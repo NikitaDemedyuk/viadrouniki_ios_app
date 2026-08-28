@@ -5,11 +5,13 @@ struct TripListView: View {
     /// The API `locale` is part of the request, so a language change
     /// invalidates what's on screen — re-running the fetch is what replaces it.
     @Environment(\.locale) private var locale
+    @Environment(AppViewModel.self) private var appViewModel
 
     var body: some View {
         NavigationStack {
             content
-                .navigationTitle("Trips")
+                // Pre-resolved off `appViewModel.language` — see `AppLanguage.localized(_:)`.
+                .navigationTitle(appViewModel.language.localized("Trips"))
                 .navigationDestination(for: Trip.self) { trip in
                     TripDetailView(trip: trip)
                 }
@@ -54,4 +56,5 @@ struct TripListView: View {
 
 #Preview {
     TripListView()
+        .environment(AppViewModel())
 }

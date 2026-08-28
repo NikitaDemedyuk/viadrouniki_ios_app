@@ -359,6 +359,22 @@
         }
       }
     },
+    "Google sign-in isn't available yet." : {
+      "localizations" : {
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Уваход праз Google пакуль недаступны."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вход через Google пока недоступен."
+          }
+        }
+      }
+    },
     "Inactive" : {
       "comment" : "Badge on a point or vehicle that is no longer active",
       "localizations" : {
@@ -404,22 +420,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Расположение"
-          }
-        }
-      }
-    },
-    "Login" : {
-      "localizations" : {
-        "be" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Уваход"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Вход"
           }
         }
       }
@@ -669,6 +669,54 @@
         }
       }
     },
+    "Settings" : {
+      "localizations" : {
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Налады"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Настройки"
+          }
+        }
+      }
+    },
+    "Sign in to Viadrouniki" : {
+      "localizations" : {
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Уваход у Viadrouniki"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вход в Viadrouniki"
+          }
+        }
+      }
+    },
+    "Sign in with Google" : {
+      "localizations" : {
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Увайсці праз Google"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Войти через Google"
+          }
+        }
+      }
+    },
     "Sort" : {
       "comment" : "Toolbar button opening sort options",
       "localizations" : {
@@ -849,6 +897,22 @@
         }
       }
     },
+    "Use Google to sign in." : {
+      "localizations" : {
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выкарыстоўвайце Google для ўваходу."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Используйте Google для входа."
+          }
+        }
+      }
+    },
     "Winter" : {
       "localizations" : {
         "be" : {
@@ -878,6 +942,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Год"
+          }
+        }
+      }
+    },
+    "You are signed in." : {
+      "localizations" : {
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вы ўвайшлі ва ўліковы запіс."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вы вошли в аккаунт."
           }
         }
       }
