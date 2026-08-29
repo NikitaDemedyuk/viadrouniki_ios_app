@@ -19,12 +19,10 @@ final class AppViewModel {
     func login(token: String) {
         AuthTokenStore.shared.token = token
         isLoggedIn = true
-        selectedTab = 3
     }
 
     func logout() {
         AuthTokenStore.shared.logout()
         isLoggedIn = false
-        selectedTab = 0
     }
 }

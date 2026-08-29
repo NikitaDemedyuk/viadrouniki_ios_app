@@ -28,6 +28,15 @@ struct ProfileView: View {
                         }
                     }
                 }
+                // The token lives in the Keychain, which survives app deletion,
+                // so without this row a signed-in user has no way back out.
+                if appViewModel.isLoggedIn {
+                    Section {
+                        Button("Sign out", role: .destructive) {
+                            appViewModel.logout()
+                        }
+                    }
+                }
             }
             .listStyle(.insetGrouped)
             // See `AppLanguage.localized(_:)` — this is the currently-visible

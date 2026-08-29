@@ -717,6 +717,22 @@
         }
       }
     },
+    "Sign out" : {
+      "localizations" : {
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выйсці"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выйти"
+          }
+        }
+      }
+    },
     "Sort" : {
       "comment" : "Toolbar button opening sort options",
       "localizations" : {
