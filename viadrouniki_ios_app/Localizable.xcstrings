@@ -198,40 +198,6 @@
         }
       }
     },
-    "Add car": {
-      "extractionState": "manual",
-      "localizations": {
-        "be": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Дадаць машыну"
-          }
-        },
-        "ru": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Добавить машину"
-          }
-        }
-      }
-    },
-    "Adding a car isn't available yet.": {
-      "extractionState": "manual",
-      "localizations": {
-        "be": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Дадаванне машыны пакуль недаступна."
-          }
-        },
-        "ru": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Добавление машины пока недоступно."
-          }
-        }
-      }
-    },
     "Ascending": {
       "localizations": {
         "be": {
@@ -1263,23 +1229,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Вы вошли в аккаунт."
-          }
-        }
-      }
-    },
-    "You haven't added any cars yet.": {
-      "extractionState": "manual",
-      "localizations": {
-        "be": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Вы яшчэ не дадалі ніводнай машыны."
-          }
-        },
-        "ru": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Вы ещё не добавили ни одной машины."
           }
         }
       }
