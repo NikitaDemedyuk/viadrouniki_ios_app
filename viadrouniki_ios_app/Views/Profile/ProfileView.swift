@@ -186,3 +186,8 @@ struct ProfileView: View {
         }
     }
 }
+
+#Preview {
+    ProfileView()
+        .environment(AppViewModel())
+}
