@@ -39,9 +39,6 @@ struct ProfileView: View {
             /// literal here also goes stale on a language change.
             .navigationTitle(appViewModel.language.localized("Profile"))
             .refreshable { await load() }
-            .navigationDestination(for: Vehicle.self) { vehicle in
-                VehicleDetailView(vehicle: vehicle)
-            }
             .sheet(isPresented: $isProfileLoginPresented) {
                 ProfileLoginView()
             }
@@ -57,16 +54,11 @@ struct ProfileView: View {
         }
     }
 
-    /// Sequences both fetches with the one error the screen acts on rather than
-    /// displays. Lives in the View because flipping `isLoggedIn` is
-    /// `AppViewModel`'s job, and a ViewModel must not reach up to it.
+    /// Lives in the View because flipping `isLoggedIn` is `AppViewModel`'s
+    /// job, and a ViewModel must not reach up to it.
     private func load() async {
         guard appViewModel.isLoggedIn else { return }
-        async let profile: Void = viewModel.load()
-        async let cars: Void = viewModel.loadCars()
-        _ = await (profile, cars)
-        /// Checked once, after both settle, so a stale token signs out exactly
-        /// once no matter which request noticed first.
+        await viewModel.load()
         if viewModel.sessionExpired {
             appViewModel.logout()
         }

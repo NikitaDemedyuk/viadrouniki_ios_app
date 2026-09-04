@@ -95,12 +95,11 @@ View (SwiftUI struct)
     - Pagination `.task`s (`fetchMoreIfNeeded`) stay unkeyed. They're per-row and the reload
       replaces the whole list anyway.
     - **`ProfileView` is the one deliberate exception: it keys on `isLoggedIn`, not `\.locale`.**
-      Its two requests (`auth/me`, `user/cars`) take no `locale` param and return no
-      server-localized text — names, emails, handles and car brands are user data — so keying on
-      the language would refetch identical bytes on every switch. Auth state is the only input
-      those requests have. This looks like the missing-key bug the review checklist flags 🟡, so
-      the comment at the call site has to say why it isn't; don't "fix" it. The two fetches share
-      one `.task` and run as an `async let` pair, so they can't race.
+      Its `auth/me` request takes no `locale` param and returns no server-localized text — name,
+      email and handles are user data — so keying on the language would refetch identical bytes
+      on every switch. Auth state is the only input that request has. This looks like the
+      missing-key bug the review checklist flags 🟡, so the comment at the call site has to say
+      why it isn't; don't "fix" it.
     - `PointListViewModel.fetchMapPoints()` is the one guarded load, because the map's `.task`
       re-runs whenever the map reappears. It stamps `loadedMapLocale` on success, so a
       list↔map toggle doesn't refetch but a language change does. Guarding on
@@ -307,6 +306,10 @@ View file naming is also not uniform: `TripListView` and `VehicleListView`, but 
   Neither takes a `locale` param — they return user data, not translated content. `fetchMyCars`
   asks for `per_page=100` and keeps no pagination state: the API caps `per_page` at 100 and a
   user's `car_limit` is 25, so the whole list is one page.
+  - **`fetchMyCars` has no call site.** `ProfileView`'s "My cars" row is a placeholder with an
+    empty action — there's no dedicated cars screen yet — so `ProfileViewModel` only calls
+    `fetchCurrentUser`. `fetchMyCars` is kept, dormant, in `APIClient+Cars.swift` for that screen
+    when it's built, the same way `fetchCurrentUser` sat unused before this feature wired it up.
   - **`user/cars`'s element type is a presumption, not a verified fact.** It decodes as
     `PaginatedResponse<Vehicle>` because it is the same backend's cars resource, but `data` was
     `[]` in every payload ever seen, and an empty array decodes cleanly against *any* element
