@@ -6,6 +6,7 @@ struct ViadrounikiApp: App {
 
     init() {
         #if DEBUG
+        // TODO: Remove this DEBUG token injection once Google sign-in is wired up.
         /// Injects a real bearer token so the signed-in Profile screens can be
         /// exercised against the live API while Google sign-in is still a stub.
         /// Set `VIADROUNIKI_DEBUG_TOKEN` in the scheme's own environment

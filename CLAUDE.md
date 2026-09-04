@@ -162,9 +162,10 @@ View (SwiftUI struct)
 
 **Use `///` only — never bare `//`.** This applies everywhere, not just above
 declarations: a `///` explaining one line inside a function body is correct, a
-`//` doing the same is not. The one exception is `// MARK: -`, because Xcode's
-jump bar only recognizes the double-slash form; a tripled `///` MARK silently
-stops working as navigation.
+`//` doing the same is not. The exceptions are Xcode's special tags —
+`// MARK: -`, `// TODO:`, `// FIXME:` — because the jump bar and the tag
+scanner only recognize the double-slash form; tripling any of them silently
+stops it from being picked up as navigation or as a flagged to-do.
 
 Default to writing no comment at all. Add one only when the WHY is genuinely
 non-obvious — a hidden backend behavior, a race avoided on purpose, a
