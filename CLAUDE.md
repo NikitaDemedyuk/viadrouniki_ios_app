@@ -177,6 +177,7 @@ exactly the kind worth keeping.
 
 ```
 App/          ViadrounikiApp.swift, ContentView.swift (TabView), AppViewModel.swift
+Assets.xcassets/  AppIcon.appiconset (generated — see below), AccentColor, brand marks
 Localizable.xcstrings   String Catalog (source language en; ru + be translations)
 Models/       Trip, Point, Vehicle, AppUser, APIResponse, PhotoResource,
               AttractionType, PointFilterKey, AppLanguage
@@ -185,6 +186,44 @@ ViewModels/   <Domain>ListViewModel.swift, <Domain>DetailViewModel.swift
 Views/        <Domain>s/ per feature, plus Components/ for shared views
 Utilities/    AuthTokenStore, KeychainStore
 ```
+
+`IconSource/` sits at the **repo root** — a sibling of the synchronized `viadrouniki_ios_app/`
+folder, not inside it — so the icon's source art and generator are versioned without ever
+being swept into the app bundle.
+
+## App icon — generated, do not hand-edit
+
+The three PNGs in `viadrouniki_ios_app/Assets.xcassets/AppIcon.appiconset/`
+(`AppIcon-light.png`, `AppIcon-dark.png`, `AppIcon-tinted.png`) are **build output, not
+authored artwork.** They are produced from `IconSource/viadrouniki_icon.svg` by
+`IconSource/make-app-icon.py` (needs `pip3 install pillow`):
+
+```bash
+python3 IconSource/make-app-icon.py
+```
+
+Retouching a PNG in an image editor is silently undone the next time anyone runs that script
+— no conflict, no warning. Change the SVG, or the script's constants, and regenerate instead.
+The script strips the source SVG's own rounded rect (iOS applies its own, larger squircle
+mask) and scales the glyph to 75% about the canvas centre; at 100% it spans 82% of the canvas
+height and reads as cramped inside the mask.
+
+**Why three files and not one.** Icon appearance on iOS 26 is a *Home Screen* setting —
+long-press → Edit → Customise → Default / Dark / Clear / Tinted — **not** a consequence of the
+system light/dark theme; only the "Auto" option follows the theme. iOS derives a dark variant
+whether or not one is supplied, and for this artwork its guess darkens the background while
+leaving the glyph dark, so the «В» nearly vanishes. The explicit `AppIcon-dark.png` exists for
+that reason, not to support the theme switch. `AppIcon-tinted.png` is greyscale on black
+because the system maps its luminance into the user's chosen tint.
+
+**Icon Composer (`.icon`) was tried and deliberately abandoned** — don't reach for it again
+without new information. A working `AppIcon.icon` package builds and renders correctly in
+light, but its per-appearance override is undocumented and could not be made to take: probing
+with an unmistakable red dark background, in both plausible JSON shapes, never produced red,
+so the dark tile was always Apple's auto-derivation. There is no CLI to verify against either
+(`--export-preview` just launches the GUI). The format's value is per-layer Liquid Glass on
+layered art; this icon is a single flat glyph, so the appiconset costs nothing — iOS still
+applies its own glass treatment to the flat image.
 
 ## Shared types — reuse, never redeclare
 
