@@ -196,7 +196,8 @@ being swept into the app bundle.
 The three PNGs in `viadrouniki_ios_app/Assets.xcassets/AppIcon.appiconset/`
 (`AppIcon-light.png`, `AppIcon-dark.png`, `AppIcon-tinted.png`) are **build output, not
 authored artwork.** They are produced from `IconSource/viadrouniki_icon.svg` by
-`IconSource/make-app-icon.py` (needs `pip3 install pillow`):
+`IconSource/make-app-icon.py` (needs `pip3 install pillow`; **macOS only** — it
+rasterises through `qlmanage`, since the repo carries no other build tooling):
 
 ```bash
 python3 IconSource/make-app-icon.py
@@ -207,6 +208,14 @@ Retouching a PNG in an image editor is silently undone the next time anyone runs
 The script strips the source SVG's own rounded rect (iOS applies its own, larger squircle
 mask) and scales the glyph to 75% about the canvas centre; at 100% it spans 82% of the canvas
 height and reads as cramped inside the mask.
+
+**The glyph's centre is measured, not hardcoded** — the script renders the path once on its
+own and takes its bounding box, so editing the SVG cannot leave a stale centre behind. That
+matters because the failure it prevents is invisible: a wrong centre emits an off-centre icon
+in all three appearances with no error and a green build. It was a hardcoded constant
+originally; don't reintroduce one. The script also refuses to run on an SVG with more than
+one `<path>`, or on a glyph that overflows the 10000-unit viewBox far enough to clip the
+measurement — both would otherwise produce a plausible-looking wrong icon.
 
 **Why three files and not one.** Icon appearance on iOS 26 is a *Home Screen* setting —
 long-press → Edit → Customise → Default / Dark / Clear / Tinted — **not** a consequence of the
