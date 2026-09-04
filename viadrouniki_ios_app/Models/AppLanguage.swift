@@ -37,6 +37,24 @@ nonisolated enum AppLanguage: String, CaseIterable, Identifiable {
     /// because the API happens to use the same codes as the bundle localizations.
     var apiLocale: String { rawValue }
 
+    /// Resolves a catalog key to a `String` in this language, bypassing SwiftUI's
+    /// `LocalizedStringKey` machinery.
+    ///
+    /// Needed anywhere a `LocalizedStringKey` value is handed to a UIKit-bridged
+    /// modifier — `.navigationTitle`, `.tabItem`'s `Label` — for a screen or tab
+    /// item that is already on screen when the language changes. That bridge
+    /// does not reliably re-resolve on an environment-only `\.locale` change, so
+    /// the bar or tab keeps showing the previous language until something else
+    /// forces a full rebuild. Pre-resolving off `AppViewModel.language` (a real
+    /// `@Observable` dependency) sidesteps it: the value handed to the modifier
+    /// genuinely differs between languages, so SwiftUI is forced to push the
+    /// update through. Plain `Text`/`Label` content inside the screen body does
+    /// not have this problem and should keep using `LocalizedStringKey` literals
+    /// as normal — reach for this only at a `.navigationTitle` or `.tabItem`.
+    func localized(_ key: String.LocalizationValue) -> String {
+        String(localized: key, bundle: bundle, locale: locale)
+    }
+
     /// Shown in the picker — each name written in its own language, not the
     /// currently selected one, so either option is readable to either audience.
     var nativeName: String {

@@ -79,8 +79,9 @@ View (SwiftUI struct)
   language, so it can't be selected in Settings and the per-app language picker can't offer it
   either. `AppLanguage` (UserDefaults-backed, defaults to Russian) is the source of truth, and
   `ViadrounikiApp` forces it onto the tree with `.environment(\.locale,)`. That one modifier is
-  what localizes every `LocalizedStringKey` — `Text`, `Label`, `.navigationTitle`, `Button`,
-  `Picker`, `ContentUnavailableView`, `.searchable(prompt:)` — with no per-call-site work.
+  what localizes every `LocalizedStringKey` — `Text`, `Button`, `Picker`, `ContentUnavailableView`,
+  `.searchable(prompt:)` — with no per-call-site work. **`.navigationTitle` and `.tabItem`'s
+  `Label` are the exception** — see below.
   - That modifier only covers catalog strings. **API content is a separate problem**: the
     `locale` query param is baked into responses already held by ViewModels, so a language
     change has to refetch. Every screen that loads content keys its `.task` on
@@ -93,6 +94,12 @@ View (SwiftUI struct)
       keeping it to one request.
     - Pagination `.task`s (`fetchMoreIfNeeded`) stay unkeyed. They're per-row and the reload
       replaces the whole list anyway.
+    - **`ProfileView` is the one deliberate exception: it keys on `isLoggedIn`, not `\.locale`.**
+      Its `auth/me` request takes no `locale` param and returns no server-localized text — name,
+      email and handles are user data — so keying on the language would refetch identical bytes
+      on every switch. Auth state is the only input that request has. This looks like the
+      missing-key bug the review checklist flags 🟡, so the comment at the call site has to say
+      why it isn't; don't "fix" it.
     - `PointListViewModel.fetchMapPoints()` is the one guarded load, because the map's `.task`
       re-runs whenever the map reappears. It stamps `loadedMapLocale` on success, so a
       list↔map toggle doesn't refetch but a language change does. Guarding on
@@ -111,11 +118,60 @@ View (SwiftUI struct)
       Belarusian string. **Pass `bundle: AppLanguage.current.bundle`** — that is what
       actually selects the language (see `APIError`, `VehicleSchedule.label`). Keep passing
       `locale:` too, for interpolated numbers and dates.
+  - **`.navigationTitle` and `.tabItem`'s `Label` do not reliably re-resolve a
+    `LocalizedStringKey` on an environment-only `\.locale` change, for whichever screen or
+    tab is currently on screen at the moment the language changes.** The key itself compares
+    equal, so SwiftUI has nothing to diff and the UIKit-bridged bar/tab item keeps showing
+    the previous language. This was first found on a *pushed* destination (`SettingsView`),
+    but is not limited to it — it also hits `ProfileView`'s own root title and its `.tabItem`
+    while `ProfileView` is the active tab. **Confirmed by A/B test, not inferred:** reverting
+    `ProfileView` to a plain `.navigationTitle("Profile")` and rebuilding reproduces a Russian
+    «Профиль» sitting above Belarusian list content and Belarusian tab items; restoring
+    `localized(_:)` removes it, in both switch directions. Worth knowing, because the rule
+    looks like superstition otherwise and invites someone to "simplify" it away. Plain
+    `Text`/`Label` content in a screen's body is unaffected and should keep using
+    `LocalizedStringKey` literals as normal.
+    - **Fix:** call `AppLanguage.localized(_:)` (in `Models/AppLanguage.swift`) at every
+      `.navigationTitle` and `.tabItem` `Label` — e.g. `appViewModel.language.localized("Settings")`.
+      It pre-resolves to a `String` off `AppViewModel.language`, a real `@Observable`
+      dependency, so the value handed to the modifier genuinely differs between languages
+      and `body` is forced to push the update through. See `SettingsView`, `ProfileView`,
+      `ContentView`.
+    - Do **not** fix it with `.id()` on a pushed destination — that changes its identity,
+      which `NavigationStack` reads as the destination disappearing, popping back to the
+      previous screen.
+    - **Every `.navigationTitle` and `.tabItem` `Label` in the app now goes through the
+      helper**, and a new one should too. `TripListView`, `PointsView`, `VehicleListView`, and
+      `PointsFilterSheet` were converted defensively rather than in response to a visible
+      break: the only language picker lives in `SettingsView` under the Profile tab, so those
+      four are always *backgrounded* when the language changes and backgrounded screens rebuild
+      correctly. That makes their conversion unverifiable today — it is non-regression, not a
+      demonstrated fix — but the mechanism is generic, not specific to `Profile`, and these are
+      the screens most likely to gain a language entry point later.
+    - Detail-screen titles that interpolate API text (`TripDetailView`, `PointDetailView`,
+      `VehicleDetailView`) need nothing: the server already localized that text, and it arrives
+      as a `String`, so there is no `LocalizedStringKey` to go stale.
   - A literal only localizes where the parameter is a `LocalizedStringKey`. A `String` variable
     or a ternary of two literals binds to the `StringProtocol` overload instead — pass `Text`
     (as `PointsFilterSheet.row(title:)` and `PointsView` do). Conversely, API-supplied text is
     already localized by the server and must *not* be looked up.
 - No third-party dependencies.
+
+## Comments
+
+**Use `///` only — never bare `//`.** This applies everywhere, not just above
+declarations: a `///` explaining one line inside a function body is correct, a
+`//` doing the same is not. The exceptions are Xcode's special tags —
+`// MARK: -`, `// TODO:`, `// FIXME:` — because the jump bar and the tag
+scanner only recognize the double-slash form; tripling any of them silently
+stops it from being picked up as navigation or as a flagged to-do.
+
+Default to writing no comment at all. Add one only when the WHY is genuinely
+non-obvious — a hidden backend behavior, a race avoided on purpose, a
+deliberate deviation from the pattern used elsewhere — never to restate what
+the code already says. A comment justified by "the reviewer might otherwise
+flag this as a bug" (see the localization and concurrency sections above) is
+exactly the kind worth keeping.
 
 ## Layout
 
@@ -215,24 +271,59 @@ View file naming is also not uniform: `TripListView` and `VehicleListView`, but 
     evaluated in a nonisolated context, and `SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor` would
     otherwise make reading it a concurrency violation.
   - Known backend gap: `attraction-types` returns Russian names even for `locale=be`.
-- **Response envelopes are not uniform — check, don't assume.** Three shapes are in use:
+- **Response envelopes are not uniform — check, don't assume.** Four shapes are in use:
   paginated lists return `{"data": [...], "meta": {...}}` (`PaginatedResponse<T>`); single
   resources and *some* collections return `{"data": ...}` (`SingleResponse<T>`, including
-  `SingleResponse<[AttractionType]>` for `attraction-types`); and `attractions/map` returns a
-  **bare top-level array** with no envelope at all. Picking the wrong one fails at runtime as
-  an `APIError.decodingError`, not at compile time. The API is public and read-only over GET,
-  so confirm the shape before writing the decode type:
+  `SingleResponse<[AttractionType]>` for `attraction-types`); `attractions/map` returns a
+  **bare top-level array** with no envelope at all; and `auth/me` returns **`{"user": ...}`**,
+  decoded by a `private struct CurrentUserResponse` local to `APIClient+Auth.swift` — one
+  endpoint has that shape, so it never joined the shared envelopes in `Models/APIResponse.swift`.
+  Picking the wrong one fails at runtime as an `APIError.decodingError`, not at compile time.
+  The public endpoints are read-only over GET, so confirm the shape before writing the decode type:
   ```bash
   curl -s 'https://api.viadrouniki.by/v1/<path>?locale=ru' | head -c 400
   ```
+  The authed ones (`auth/me`, `user/cars`) can't be confirmed that way — see the `Accept` note below.
 - Timestamps are ISO8601 **with fractional seconds** (`2026-01-30T18:55:47.000000Z`). The
   shared decoder in `APIClient` requires them; a field typed `Date` that arrives in any other
   format fails the whole response decode, and making the property optional does *not* rescue
   it — `decodeIfPresent` still runs the date strategy and rethrows.
+  - **`AppUser.emailVerifiedAt` is therefore typed `String?`, not `Date?`, on purpose.** It is
+    `null` in every payload seen, so its non-null format is unverified — and a wrong guess would
+    fail the whole profile decode *only for users who have verified their email*, i.e. invisibly
+    in testing. Nothing needs the value, only its nullity (`isEmailVerified`). Don't "improve" it
+    to a `Date` without a verified sample. `AppUser` has no `Date` fields at all as a result.
 - `get(url:requiresAuth:)` defaults to `false`; `post` always attaches the token when one is
   present, with no opt-out.
+- **`perform(_:)` sets `Accept: application/json` on every request, and that header is
+  load-bearing — do not remove it as noise.** Laravel emits a JSON 401 only when the request asks
+  for JSON; without it, an unauthenticated call to a protected route comes back as **500 with an
+  HTML body**, which `perform` maps to `.serverError(500)`, leaving `APIError.unauthorized`
+  unreachable and any `catch APIError.unauthorized` dead code. Verified by curl on `auth/me` and
+  `user/cars`, in both directions. It is safe on the public endpoints: success responses are
+  byte-identical (md5-equal) with and without it on all six shapes the app fetches.
+- **Two endpoints require auth: `auth/me` and `user/cars`** (`fetchCurrentUser`, `fetchMyCars`).
+  Neither takes a `locale` param — they return user data, not translated content. `fetchMyCars`
+  asks for `per_page=100` and keeps no pagination state: the API caps `per_page` at 100 and a
+  user's `car_limit` is 25, so the whole list is one page.
+  - **`fetchMyCars` has no call site.** `ProfileView`'s "My cars" row is a placeholder with an
+    empty action — there's no dedicated cars screen yet — so `ProfileViewModel` only calls
+    `fetchCurrentUser`. `fetchMyCars` is kept, dormant, in `APIClient+Cars.swift` for that screen
+    when it's built, the same way `fetchCurrentUser` sat unused before this feature wired it up.
+  - **`user/cars`'s element type is a presumption, not a verified fact.** It decodes as
+    `PaginatedResponse<Vehicle>` because it is the same backend's cars resource, but `data` was
+    `[]` in every payload ever seen, and an empty array decodes cleanly against *any* element
+    type. `Vehicle` is a wide, strict target (non-optional `brand`, `model`, `year`, `user`,
+    `photosCount`, `tripsCount`, `isActive`, `canDelete`, and two non-optional fractional-seconds
+    `Date`s), so a lighter "my cars" serializer would break it. The first account that actually
+    owns a car is the real test.
 - There are **no POST endpoints in the app yet** — login is a UI stub. `APIClient.post` exists
   and works, but a first real POST has no precedent to pattern-match, so confirm body shape
-  and auth expectations explicitly.
+  and auth expectations explicitly. Two features are parked on this: `ProfileView`'s **`Add car`
+  row**, which shows an "isn't available yet" alert because the create-car path, body shape and
+  photo-upload flow are all unspecified; and `ProfileAccountView`'s **Telegram settings rows**,
+  which are read-only `LabeledContent` for the same reason. Neither is an oversight — don't
+  "finish" either by guessing a request shape, and don't turn the settings rows into `Toggle`s
+  (disabled or otherwise) while they can't be written back.
 </content>
 </invoke>

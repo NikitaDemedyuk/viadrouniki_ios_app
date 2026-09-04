@@ -1,159 +1,95 @@
 {
-  "sourceLanguage" : "en",
-  "strings" : {
-    "%@ %@" : {
-      "shouldTranslate" : false
+  "sourceLanguage": "en",
+  "strings": {
+    "%@ %@": {
+      "shouldTranslate": false
     },
-    "%@ · %@" : {
-      "shouldTranslate" : false
+    "%@ · %@": {
+      "shouldTranslate": false
     },
-    "%@%@" : {
-      "shouldTranslate" : false
+    "%@%@": {
+      "shouldTranslate": false
     },
-    "%@, %@" : {
-      "shouldTranslate" : false
+    "%@, %@": {
+      "shouldTranslate": false
     },
-    "%lld" : {
-      "shouldTranslate" : false
+    "%lld": {
+      "shouldTranslate": false
     },
-    "%lld km" : {
-      "comment" : "Route length. The abbreviation does not decline, so no plural variations are needed.",
-      "localizations" : {
-        "be" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld км"
+    "%lld km": {
+      "comment": "Route length. The abbreviation does not decline, so no plural variations are needed.",
+      "localizations": {
+        "be": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld км"
           }
         },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld км"
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld км"
           }
         }
       }
     },
-    "%lld photos" : {
-      "localizations" : {
-        "be" : {
-          "variations" : {
-            "plural" : {
-              "few" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%lld фотаздымкі"
+    "%lld photos": {
+      "localizations": {
+        "be": {
+          "variations": {
+            "plural": {
+              "few": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld фотаздымкі"
                 }
               },
-              "many" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%lld фотаздымкаў"
+              "many": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld фотаздымкаў"
                 }
               },
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%lld фотаздымак"
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld фотаздымак"
                 }
               },
-              "other" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%lld фотаздымка"
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld фотаздымка"
                 }
               }
             }
           }
         },
-        "ru" : {
-          "variations" : {
-            "plural" : {
-              "few" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%lld фотографии"
+        "ru": {
+          "variations": {
+            "plural": {
+              "few": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld фотографии"
                 }
               },
-              "many" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%lld фотографий"
+              "many": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld фотографий"
                 }
               },
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%lld фотография"
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld фотография"
                 }
               },
-              "other" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%lld фотографии"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "%lld trips" : {
-      "localizations" : {
-        "be" : {
-          "variations" : {
-            "plural" : {
-              "few" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%lld маршруты"
-                }
-              },
-              "many" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%lld маршрутаў"
-                }
-              },
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%lld маршрут"
-                }
-              },
-              "other" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%lld маршрута"
-                }
-              }
-            }
-          }
-        },
-        "ru" : {
-          "variations" : {
-            "plural" : {
-              "few" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%lld маршрута"
-                }
-              },
-              "many" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%lld маршрутов"
-                }
-              },
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%lld маршрут"
-                }
-              },
-              "other" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%lld маршрута"
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld фотографии"
                 }
               }
             }
@@ -161,727 +97,1142 @@
         }
       }
     },
-    "@%@" : {
-      "shouldTranslate" : false
-    },
-    "About" : {
-      "comment" : "Section heading for a description",
-      "localizations" : {
-        "be" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Апісанне"
+    "%lld trips": {
+      "localizations": {
+        "be": {
+          "variations": {
+            "plural": {
+              "few": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld маршруты"
+                }
+              },
+              "many": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld маршрутаў"
+                }
+              },
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld маршрут"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld маршрута"
+                }
+              }
+            }
           }
         },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Описание"
+        "ru": {
+          "variations": {
+            "plural": {
+              "few": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld маршрута"
+                }
+              },
+              "many": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld маршрутов"
+                }
+              },
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld маршрут"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld маршрута"
+                }
+              }
+            }
           }
         }
       }
     },
-    "Ascending" : {
-      "localizations" : {
-        "be" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Па ўзрастанні"
+    "@%@": {
+      "shouldTranslate": false
+    },
+    "About": {
+      "comment": "Section heading for a description",
+      "localizations": {
+        "be": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Апісанне"
           }
         },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "По возрастанию"
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Описание"
           }
         }
       }
     },
-    "Attractions" : {
-      "localizations" : {
-        "be" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Славутасці"
+    "Account": {
+      "extractionState": "manual",
+      "localizations": {
+        "be": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Уліковы запіс"
           }
         },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Достопримечательности"
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Аккаунт"
           }
         }
       }
     },
-    "Brand" : {
-      "comment" : "Vehicle make, used as a sort option",
-      "localizations" : {
-        "be" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Марка"
+    "Ascending": {
+      "localizations": {
+        "be": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Па ўзрастанні"
           }
         },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Марка"
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "По возрастанию"
           }
         }
       }
     },
-    "Cars" : {
-      "comment" : "Tab title, the car list screen title, and the trip-detail section heading — all three share this key.",
-      "localizations" : {
-        "be" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Машыны"
+    "Attractions": {
+      "localizations": {
+        "be": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Славутасці"
           }
         },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Машины"
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Достопримечательности"
           }
         }
       }
     },
-    "Descending" : {
-      "localizations" : {
-        "be" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Па спаданні"
+    "Brand": {
+      "comment": "Vehicle make, used as a sort option",
+      "localizations": {
+        "be": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Марка"
           }
         },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "По убыванию"
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Марка"
           }
         }
       }
     },
-    "Done" : {
-      "localizations" : {
-        "be" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Гатова"
+    "Cars": {
+      "comment": "Tab title, the car list screen title, and the trip-detail section heading — all three share this key.",
+      "localizations": {
+        "be": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Машыны"
           }
         },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Готово"
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Машины"
           }
         }
       }
     },
-    "Failed to load points" : {
-      "localizations" : {
-        "be" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Не ўдалося загрузіць кропкі"
+    "Daily digest": {
+      "extractionState": "manual",
+      "localizations": {
+        "be": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Штодзённая зводка"
           }
         },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Не удалось загрузить точки"
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ежедневная сводка"
           }
         }
       }
     },
-    "Failed to load trips" : {
-      "localizations" : {
-        "be" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Не ўдалося загрузіць маршруты"
+    "Descending": {
+      "localizations": {
+        "be": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Па спаданні"
           }
         },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Не удалось загрузить маршруты"
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "По убыванию"
           }
         }
       }
     },
-    "Failed to load vehicles" : {
-      "localizations" : {
-        "be" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Не ўдалося загрузіць машыны"
+    "Done": {
+      "localizations": {
+        "be": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Гатова"
           }
         },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Не удалось загрузить машины"
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Готово"
           }
         }
       }
     },
-    "Failed to parse response: %@" : {
-      "localizations" : {
-        "be" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Не ўдалося апрацаваць адказ: %@"
+    "Email": {
+      "extractionState": "manual",
+      "localizations": {
+        "be": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Эл. пошта"
           }
         },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Не удалось обработать ответ: %@"
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Эл. почта"
           }
         }
       }
     },
-    "Filter Points" : {
-      "localizations" : {
-        "be" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Фільтр кропак"
+    "Failed to load points": {
+      "localizations": {
+        "be": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Не ўдалося загрузіць кропкі"
           }
         },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Фильтр точек"
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Не удалось загрузить точки"
           }
         }
       }
     },
-    "Inactive" : {
-      "comment" : "Badge on a point or vehicle that is no longer active",
-      "localizations" : {
-        "be" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Неактыўны"
+    "Failed to load trips": {
+      "localizations": {
+        "be": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Не ўдалося загрузіць маршруты"
           }
         },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Неактивен"
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Не удалось загрузить маршруты"
           }
         }
       }
     },
-    "Language" : {
-      "localizations" : {
-        "be" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Мова"
+    "Failed to load vehicles": {
+      "localizations": {
+        "be": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Не ўдалося загрузіць машыны"
           }
         },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Язык"
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Не удалось загрузить машины"
           }
         }
       }
     },
-    "Location" : {
-      "localizations" : {
-        "be" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Размяшчэнне"
+    "Failed to parse response: %@": {
+      "localizations": {
+        "be": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Не ўдалося апрацаваць адказ: %@"
           }
         },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Расположение"
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Не удалось обработать ответ: %@"
           }
         }
       }
     },
-    "Login" : {
-      "localizations" : {
-        "be" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Уваход"
+    "Filter Points": {
+      "localizations": {
+        "be": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Фільтр кропак"
           }
         },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Вход"
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Фильтр точек"
           }
         }
       }
     },
-    "Meeting point" : {
-      "localizations" : {
-        "be" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Месца сустрэчы"
+    "Google sign-in isn't available yet.": {
+      "localizations": {
+        "be": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Уваход праз Google пакуль недаступны."
           }
         },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Место встречи"
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Вход через Google пока недоступен."
           }
         }
       }
     },
-    "Network error: %@" : {
-      "localizations" : {
-        "be" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Памылка сеткі: %@"
+    "Inactive": {
+      "comment": "Badge on a point or vehicle that is no longer active",
+      "localizations": {
+        "be": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Неактыўны"
           }
         },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ошибка сети: %@"
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Неактивен"
           }
         }
       }
     },
-    "No cars linked to this trip yet" : {
-      "localizations" : {
-        "be" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Да гэтага маршруту пакуль не прывязана ніводная машына"
+    "Language": {
+      "localizations": {
+        "be": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Мова"
           }
         },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "К этому маршруту пока не привязана ни одна машина"
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Язык"
           }
         }
       }
     },
-    "No points available" : {
-      "localizations" : {
-        "be" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Кропак пакуль няма"
+    "Linked accounts": {
+      "extractionState": "manual",
+      "localizations": {
+        "be": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Прывязаныя ўліковыя запісы"
           }
         },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Точек пока нет"
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Привязанные аккаунты"
           }
         }
       }
     },
-    "No points found" : {
-      "localizations" : {
-        "be" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Кропкі не знойдзены"
+    "Location": {
+      "localizations": {
+        "be": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Размяшчэнне"
           }
         },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Точки не найдены"
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Расположение"
           }
         }
       }
     },
-    "Order" : {
-      "comment" : "Sort direction",
-      "localizations" : {
-        "be" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Парадак"
+    "Meeting point": {
+      "localizations": {
+        "be": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Месца сустрэчы"
           }
         },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Порядок"
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Место встречи"
           }
         }
       }
     },
-    "Owner" : {
-      "comment" : "The person who owns a vehicle",
-      "localizations" : {
-        "be" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Уладальнік"
+    "My cars": {
+      "extractionState": "manual",
+      "localizations": {
+        "be": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Мае машыны"
           }
         },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Владелец"
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Мои машины"
           }
         }
       }
     },
-    "Points" : {
-      "comment" : "Tab title: places of interest on the map",
-      "localizations" : {
-        "be" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Кропкі"
+    "Name": {
+      "extractionState": "manual",
+      "localizations": {
+        "be": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Імя"
           }
         },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Точки"
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Имя"
           }
         }
       }
     },
-    "Profile" : {
-      "localizations" : {
-        "be" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Профіль"
+    "Network error: %@": {
+      "localizations": {
+        "be": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Памылка сеткі: %@"
           }
         },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Профиль"
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ошибка сети: %@"
           }
         }
       }
     },
-    "Reset" : {
-      "localizations" : {
-        "be" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Скінуць"
+    "No cars linked to this trip yet": {
+      "localizations": {
+        "be": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Да гэтага маршруту пакуль не прывязана ніводная машына"
           }
         },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Сбросить"
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "К этому маршруту пока не привязана ни одна машина"
           }
         }
       }
     },
-    "Retry" : {
-      "localizations" : {
-        "be" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Паўтарыць"
+    "No points available": {
+      "localizations": {
+        "be": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Кропак пакуль няма"
           }
         },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Повторить"
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Точек пока нет"
           }
         }
       }
     },
-    "Search points" : {
-      "comment" : "Search field placeholder",
-      "localizations" : {
-        "be" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Пошук кропак"
+    "No points found": {
+      "localizations": {
+        "be": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Кропкі не знойдзены"
           }
         },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Поиск точек"
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Точки не найдены"
           }
         }
       }
     },
-    "Season" : {
-      "comment" : "Vehicle availability when neither summer nor winter is known",
-      "localizations" : {
-        "be" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Сезон"
+    "Not linked": {
+      "extractionState": "manual",
+      "localizations": {
+        "be": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Не прывязаны"
           }
         },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Сезон"
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Не привязан"
           }
         }
       }
     },
-    "Select All" : {
-      "localizations" : {
-        "be" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Выбраць усе"
+    "Notifications": {
+      "extractionState": "manual",
+      "localizations": {
+        "be": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Апавяшчэнні"
           }
         },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Выбрать все"
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Уведомления"
           }
         }
       }
     },
-    "Server error (%lld)." : {
-      "localizations" : {
-        "be" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Памылка сервера (%lld)."
+    "OK": {
+      "extractionState": "manual",
+      "localizations": {
+        "be": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "OK"
           }
         },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ошибка сервера (%lld)."
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "OK"
           }
         }
       }
     },
-    "Sort" : {
-      "comment" : "Toolbar button opening sort options",
-      "localizations" : {
-        "be" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Сартаванне"
+    "Off": {
+      "extractionState": "manual",
+      "localizations": {
+        "be": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Выключана"
           }
         },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Сортировка"
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Выключено"
           }
         }
       }
     },
-    "Sort by" : {
-      "localizations" : {
-        "be" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Сартаваць па"
+    "On": {
+      "extractionState": "manual",
+      "localizations": {
+        "be": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Уключана"
           }
         },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Сортировать по"
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Включено"
           }
         }
       }
     },
-    "Summer" : {
-      "localizations" : {
-        "be" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Лета"
+    "Order": {
+      "comment": "Sort direction",
+      "localizations": {
+        "be": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Парадак"
           }
         },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Лето"
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Порядок"
           }
         }
       }
     },
-    "Switch to list" : {
-      "comment" : "Accessibility label",
-      "localizations" : {
-        "be" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Пераключыць на спіс"
+    "Owner": {
+      "comment": "The person who owns a vehicle",
+      "localizations": {
+        "be": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Уладальнік"
           }
         },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Переключить на список"
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Владелец"
           }
         }
       }
     },
-    "Switch to map" : {
-      "comment" : "Accessibility label",
-      "localizations" : {
-        "be" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Пераключыць на карту"
+    "Personal info": {
+      "extractionState": "manual",
+      "localizations": {
+        "be": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Асабістыя даныя"
           }
         },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Переключить на карту"
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Личные данные"
           }
         }
       }
     },
-    "There aren't any trips to this point yet" : {
-      "localizations" : {
-        "be" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Да гэтай кропкі пакуль няма маршрутаў"
+    "Points": {
+      "comment": "Tab title: places of interest on the map",
+      "localizations": {
+        "be": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Кропкі"
           }
         },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "К этой точке пока нет маршрутов"
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Точки"
           }
         }
       }
     },
-    "There aren't any trips with this car right now" : {
-      "localizations" : {
-        "be" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Зараз няма маршрутаў з гэтай машынай"
+    "Profile": {
+      "localizations": {
+        "be": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Профіль"
           }
         },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Сейчас нет маршрутов с этой машиной"
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Профиль"
           }
         }
       }
     },
-    "Trips" : {
-      "localizations" : {
-        "be" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Маршруты"
+    "Reset": {
+      "localizations": {
+        "be": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Скінуць"
           }
         },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Маршруты"
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Сбросить"
           }
         }
       }
     },
-    "Try a different search" : {
-      "localizations" : {
-        "be" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Паспрабуйце змяніць запыт"
+    "Retry": {
+      "localizations": {
+        "be": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Паўтарыць"
           }
         },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Попробуйте изменить запрос"
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Повторить"
           }
         }
       }
     },
-    "Unauthorized. Please log in again." : {
-      "localizations" : {
-        "be" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Не аўтарызаваны. Калі ласка, увайдзіце зноў."
+    "Search points": {
+      "comment": "Search field placeholder",
+      "localizations": {
+        "be": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Пошук кропак"
           }
         },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Не авторизован. Пожалуйста, войдите снова."
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Поиск точек"
           }
         }
       }
     },
-    "Unknown type" : {
-      "comment" : "Filter row for points with no type, or a type the app doesn't know",
-      "localizations" : {
-        "be" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Невядомы тып"
+    "Season": {
+      "comment": "Vehicle availability when neither summer nor winter is known",
+      "localizations": {
+        "be": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Сезон"
           }
         },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Неизвестный тип"
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Сезон"
           }
         }
       }
     },
-    "Winter" : {
-      "localizations" : {
-        "be" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Зіма"
+    "Select All": {
+      "localizations": {
+        "be": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Выбраць усе"
           }
         },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Зима"
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Выбрать все"
           }
         }
       }
     },
-    "Year" : {
-      "comment" : "Vehicle model year, used as a sort option",
-      "localizations" : {
-        "be" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Год"
+    "Server error (%lld).": {
+      "localizations": {
+        "be": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Памылка сервера (%lld)."
           }
         },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Год"
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ошибка сервера (%lld)."
+          }
+        }
+      }
+    },
+    "Settings": {
+      "localizations": {
+        "be": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Налады"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Настройки"
+          }
+        }
+      }
+    },
+    "Sign in to Viadrouniki": {
+      "localizations": {
+        "be": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Уваход у Viadrouniki"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Вход в Viadrouniki"
+          }
+        }
+      }
+    },
+    "Sign in with Google": {
+      "localizations": {
+        "be": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Увайсці праз Google"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Войти через Google"
+          }
+        }
+      }
+    },
+    "Sign out": {
+      "localizations": {
+        "be": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Выйсці"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Выйти"
+          }
+        }
+      }
+    },
+    "Sort": {
+      "comment": "Toolbar button opening sort options",
+      "localizations": {
+        "be": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Сартаванне"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Сортировка"
+          }
+        }
+      }
+    },
+    "Sort by": {
+      "localizations": {
+        "be": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Сартаваць па"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Сортировать по"
+          }
+        }
+      }
+    },
+    "Summer": {
+      "localizations": {
+        "be": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Лета"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Лето"
+          }
+        }
+      }
+    },
+    "Switch to list": {
+      "comment": "Accessibility label",
+      "localizations": {
+        "be": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Пераключыць на спіс"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Переключить на список"
+          }
+        }
+      }
+    },
+    "Switch to map": {
+      "comment": "Accessibility label",
+      "localizations": {
+        "be": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Пераключыць на карту"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Переключить на карту"
+          }
+        }
+      }
+    },
+    "Telegram alerts": {
+      "extractionState": "manual",
+      "localizations": {
+        "be": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Апавяшчэнні ў Telegram"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Уведомления в Telegram"
+          }
+        }
+      }
+    },
+    "There aren't any trips to this point yet": {
+      "localizations": {
+        "be": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Да гэтай кропкі пакуль няма маршрутаў"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "К этой точке пока нет маршрутов"
+          }
+        }
+      }
+    },
+    "There aren't any trips with this car right now": {
+      "localizations": {
+        "be": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Зараз няма маршрутаў з гэтай машынай"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Сейчас нет маршрутов с этой машиной"
+          }
+        }
+      }
+    },
+    "These settings can be changed on viadrouniki.by.": {
+      "extractionState": "manual",
+      "localizations": {
+        "be": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Гэтыя налады можна змяніць на сайце viadrouniki.by."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Эти настройки можно изменить на сайте viadrouniki.by."
+          }
+        }
+      }
+    },
+    "This email address hasn't been verified yet.": {
+      "extractionState": "manual",
+      "localizations": {
+        "be": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Адрас эл. пошты яшчэ не пацверджаны."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Адрес эл. почты ещё не подтверждён."
+          }
+        }
+      }
+    },
+    "Trips": {
+      "localizations": {
+        "be": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Маршруты"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Маршруты"
+          }
+        }
+      }
+    },
+    "Try a different search": {
+      "localizations": {
+        "be": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Паспрабуйце змяніць запыт"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Попробуйте изменить запрос"
+          }
+        }
+      }
+    },
+    "Unauthorized. Please log in again.": {
+      "localizations": {
+        "be": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Не аўтарызаваны. Калі ласка, увайдзіце зноў."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Не авторизован. Пожалуйста, войдите снова."
+          }
+        }
+      }
+    },
+    "Unknown type": {
+      "comment": "Filter row for points with no type, or a type the app doesn't know",
+      "localizations": {
+        "be": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Невядомы тып"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Неизвестный тип"
+          }
+        }
+      }
+    },
+    "Use Google to sign in.": {
+      "localizations": {
+        "be": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Выкарыстоўвайце Google для ўваходу."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Используйте Google для входа."
+          }
+        }
+      }
+    },
+    "Winter": {
+      "localizations": {
+        "be": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Зіма"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Зима"
+          }
+        }
+      }
+    },
+    "Year": {
+      "comment": "Vehicle model year, used as a sort option",
+      "localizations": {
+        "be": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Год"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Год"
+          }
+        }
+      }
+    },
+    "You are signed in.": {
+      "localizations": {
+        "be": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Вы ўвайшлі ва ўліковы запіс."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Вы вошли в аккаунт."
           }
         }
       }
     }
   },
-  "version" : "1.0"
+  "version": "1.0"
 }

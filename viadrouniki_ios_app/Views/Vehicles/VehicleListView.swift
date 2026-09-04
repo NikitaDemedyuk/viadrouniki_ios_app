@@ -14,12 +14,14 @@ struct VehicleListView: View {
     /// The API `locale` is part of the request, so a language change
     /// invalidates what's on screen — re-running the fetch is what replaces it.
     @Environment(\.locale) private var locale
+    @Environment(AppViewModel.self) private var appViewModel
 
     var body: some View {
         @Bindable var viewModel = viewModel
         NavigationStack {
             content
-                .navigationTitle("Cars")
+                // Pre-resolved off `appViewModel.language` — see `AppLanguage.localized(_:)`.
+                .navigationTitle(appViewModel.language.localized("Cars"))
                 .navigationDestination(for: Vehicle.self) { vehicle in
                     VehicleDetailView(vehicle: vehicle)
                 }
@@ -93,4 +95,5 @@ struct VehicleListView: View {
 
 #Preview {
     VehicleListView()
+        .environment(AppViewModel())
 }
