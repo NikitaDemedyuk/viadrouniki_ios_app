@@ -4,7 +4,6 @@ struct ProfileView: View {
     @Environment(AppViewModel.self) private var appViewModel
     @State private var viewModel = ProfileViewModel()
     @State private var isProfileLoginPresented = false
-    @State private var isAddCarUnavailablePresented = false
 
     var body: some View {
         NavigationStack {
@@ -16,11 +15,10 @@ struct ProfileView: View {
                     }
                 }
 
-                if appViewModel.isLoggedIn {
-                    myCarsSection
-                }
-
                 Section {
+                    if appViewModel.isLoggedIn {
+                        myCarsRow
+                    }
                     settingsRow
                 }
 
@@ -46,11 +44,6 @@ struct ProfileView: View {
             }
             .sheet(isPresented: $isProfileLoginPresented) {
                 ProfileLoginView()
-            }
-            .alert("Add car", isPresented: $isAddCarUnavailablePresented) {
-                Button("OK", role: .cancel) {}
-            } message: {
-                Text("Adding a car isn't available yet.")
             }
         }
         /// Keyed on `isLoggedIn`, not `\.locale` — neither request takes a
@@ -132,57 +125,47 @@ struct ProfileView: View {
         .contentShape(Rectangle())
     }
 
-    @ViewBuilder
-    private var myCarsSection: some View {
-        Section {
-            if viewModel.isLoadingCars && viewModel.cars.isEmpty {
-                ProgressView()
-                    .frame(maxWidth: .infinity)
-            } else if let message = viewModel.carsErrorMessage, viewModel.cars.isEmpty {
-                ErrorBannerView(message: message) { await viewModel.loadCars() }
-            } else {
-                ForEach(viewModel.cars) { vehicle in
-                    NavigationLink(value: vehicle) {
-                        ProfileCarRow(vehicle: vehicle)
-                    }
-                }
-            }
-            addCarRow
-        } header: {
-            Text("My cars")
-        } footer: {
-            if viewModel.cars.isEmpty, !viewModel.isLoadingCars, viewModel.carsErrorMessage == nil {
-                Text("You haven't added any cars yet.")
-            }
-        }
-    }
-
-    /// A stub: creating a car needs a POST endpoint, body shape, and photo
-    /// upload flow that don't exist yet. See CLAUDE.md.
-    private var addCarRow: some View {
+    /// Not wired up yet — no dedicated cars screen exists. Placeholder row,
+    /// styled like `settingsRow`, with an empty action until that screen and
+    /// its navigation are built.
+    private var myCarsRow: some View {
         Button {
-            isAddCarUnavailablePresented = true
         } label: {
-            Label("Add car", systemImage: "plus.circle.fill")
+            HStack {
+                iconRow(systemImage: "car.fill", tint: .blue, title: "My cars")
+                Spacer()
+                /// `NavigationLink` draws this automatically; this row is a
+                /// plain `Button` since there's no destination yet, so it's
+                /// added by hand to match `settingsRow`'s look.
+                Image(systemName: "chevron.right")
+                    .font(.footnote.weight(.semibold))
+                    .foregroundStyle(.tertiary)
+            }
+            .contentShape(Rectangle())
         }
+        .buttonStyle(.plain)
     }
 
     private var settingsRow: some View {
         NavigationLink {
             SettingsView()
         } label: {
-            HStack(spacing: 12) {
-                RoundedRectangle(cornerRadius: 8)
-                    .fill(.gray.gradient)
-                    .frame(width: 32, height: 32)
-                    .overlay {
-                        Image(systemName: "gear")
-                            .font(.system(size: 19, weight: .medium))
-                            .foregroundStyle(.white)
-                    }
-                Text("Settings")
-                    .foregroundStyle(.primary)
-            }
+            iconRow(systemImage: "gear", title: "Settings")
+        }
+    }
+
+    private func iconRow(systemImage: String, tint: Color = .gray, title: LocalizedStringKey) -> some View {
+        HStack(spacing: 12) {
+            RoundedRectangle(cornerRadius: 8)
+                .fill(tint.gradient)
+                .frame(width: 32, height: 32)
+                .overlay {
+                    Image(systemName: systemImage)
+                        .font(.system(size: 19, weight: .medium))
+                        .foregroundStyle(.white)
+                }
+            Text(title)
+                .foregroundStyle(.primary)
         }
     }
 }
