@@ -94,6 +94,13 @@ View (SwiftUI struct)
       keeping it to one request.
     - Pagination `.task`s (`fetchMoreIfNeeded`) stay unkeyed. They're per-row and the reload
       replaces the whole list anyway.
+    - **`ProfileView` is the one deliberate exception: it keys on `isLoggedIn`, not `\.locale`.**
+      Its two requests (`auth/me`, `user/cars`) take no `locale` param and return no
+      server-localized text — names, emails, handles and car brands are user data — so keying on
+      the language would refetch identical bytes on every switch. Auth state is the only input
+      those requests have. This looks like the missing-key bug the review checklist flags 🟡, so
+      the comment at the call site has to say why it isn't; don't "fix" it. The two fetches share
+      one `.task` and run as an `async let` pair, so they can't race.
     - `PointListViewModel.fetchMapPoints()` is the one guarded load, because the map's `.task`
       re-runs whenever the map reappears. It stamps `loadedMapLocale` on success, so a
       list↔map toggle doesn't refetch but a language change does. Guarding on
@@ -150,6 +157,21 @@ View (SwiftUI struct)
     (as `PointsFilterSheet.row(title:)` and `PointsView` do). Conversely, API-supplied text is
     already localized by the server and must *not* be looked up.
 - No third-party dependencies.
+
+## Comments
+
+**Use `///` only — never bare `//`.** This applies everywhere, not just above
+declarations: a `///` explaining one line inside a function body is correct, a
+`//` doing the same is not. The one exception is `// MARK: -`, because Xcode's
+jump bar only recognizes the double-slash form; a tripled `///` MARK silently
+stops working as navigation.
+
+Default to writing no comment at all. Add one only when the WHY is genuinely
+non-obvious — a hidden backend behavior, a race avoided on purpose, a
+deliberate deviation from the pattern used elsewhere — never to restate what
+the code already says. A comment justified by "the reviewer might otherwise
+flag this as a bug" (see the localization and concurrency sections above) is
+exactly the kind worth keeping.
 
 ## Layout
 
@@ -249,24 +271,55 @@ View file naming is also not uniform: `TripListView` and `VehicleListView`, but 
     evaluated in a nonisolated context, and `SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor` would
     otherwise make reading it a concurrency violation.
   - Known backend gap: `attraction-types` returns Russian names even for `locale=be`.
-- **Response envelopes are not uniform — check, don't assume.** Three shapes are in use:
+- **Response envelopes are not uniform — check, don't assume.** Four shapes are in use:
   paginated lists return `{"data": [...], "meta": {...}}` (`PaginatedResponse<T>`); single
   resources and *some* collections return `{"data": ...}` (`SingleResponse<T>`, including
-  `SingleResponse<[AttractionType]>` for `attraction-types`); and `attractions/map` returns a
-  **bare top-level array** with no envelope at all. Picking the wrong one fails at runtime as
-  an `APIError.decodingError`, not at compile time. The API is public and read-only over GET,
-  so confirm the shape before writing the decode type:
+  `SingleResponse<[AttractionType]>` for `attraction-types`); `attractions/map` returns a
+  **bare top-level array** with no envelope at all; and `auth/me` returns **`{"user": ...}`**,
+  decoded by a `private struct CurrentUserResponse` local to `APIClient+Auth.swift` — one
+  endpoint has that shape, so it never joined the shared envelopes in `Models/APIResponse.swift`.
+  Picking the wrong one fails at runtime as an `APIError.decodingError`, not at compile time.
+  The public endpoints are read-only over GET, so confirm the shape before writing the decode type:
   ```bash
   curl -s 'https://api.viadrouniki.by/v1/<path>?locale=ru' | head -c 400
   ```
+  The authed ones (`auth/me`, `user/cars`) can't be confirmed that way — see the `Accept` note below.
 - Timestamps are ISO8601 **with fractional seconds** (`2026-01-30T18:55:47.000000Z`). The
   shared decoder in `APIClient` requires them; a field typed `Date` that arrives in any other
   format fails the whole response decode, and making the property optional does *not* rescue
   it — `decodeIfPresent` still runs the date strategy and rethrows.
+  - **`AppUser.emailVerifiedAt` is therefore typed `String?`, not `Date?`, on purpose.** It is
+    `null` in every payload seen, so its non-null format is unverified — and a wrong guess would
+    fail the whole profile decode *only for users who have verified their email*, i.e. invisibly
+    in testing. Nothing needs the value, only its nullity (`isEmailVerified`). Don't "improve" it
+    to a `Date` without a verified sample. `AppUser` has no `Date` fields at all as a result.
 - `get(url:requiresAuth:)` defaults to `false`; `post` always attaches the token when one is
   present, with no opt-out.
+- **`perform(_:)` sets `Accept: application/json` on every request, and that header is
+  load-bearing — do not remove it as noise.** Laravel emits a JSON 401 only when the request asks
+  for JSON; without it, an unauthenticated call to a protected route comes back as **500 with an
+  HTML body**, which `perform` maps to `.serverError(500)`, leaving `APIError.unauthorized`
+  unreachable and any `catch APIError.unauthorized` dead code. Verified by curl on `auth/me` and
+  `user/cars`, in both directions. It is safe on the public endpoints: success responses are
+  byte-identical (md5-equal) with and without it on all six shapes the app fetches.
+- **Two endpoints require auth: `auth/me` and `user/cars`** (`fetchCurrentUser`, `fetchMyCars`).
+  Neither takes a `locale` param — they return user data, not translated content. `fetchMyCars`
+  asks for `per_page=100` and keeps no pagination state: the API caps `per_page` at 100 and a
+  user's `car_limit` is 25, so the whole list is one page.
+  - **`user/cars`'s element type is a presumption, not a verified fact.** It decodes as
+    `PaginatedResponse<Vehicle>` because it is the same backend's cars resource, but `data` was
+    `[]` in every payload ever seen, and an empty array decodes cleanly against *any* element
+    type. `Vehicle` is a wide, strict target (non-optional `brand`, `model`, `year`, `user`,
+    `photosCount`, `tripsCount`, `isActive`, `canDelete`, and two non-optional fractional-seconds
+    `Date`s), so a lighter "my cars" serializer would break it. The first account that actually
+    owns a car is the real test.
 - There are **no POST endpoints in the app yet** — login is a UI stub. `APIClient.post` exists
   and works, but a first real POST has no precedent to pattern-match, so confirm body shape
-  and auth expectations explicitly.
+  and auth expectations explicitly. Two features are parked on this: `ProfileView`'s **`Add car`
+  row**, which shows an "isn't available yet" alert because the create-car path, body shape and
+  photo-upload flow are all unspecified; and `ProfileAccountView`'s **Telegram settings rows**,
+  which are read-only `LabeledContent` for the same reason. Neither is an oversight — don't
+  "finish" either by guessing a request shape, and don't turn the settings rows into `Toggle`s
+  (disabled or otherwise) while they can't be written back.
 </content>
 </invoke>

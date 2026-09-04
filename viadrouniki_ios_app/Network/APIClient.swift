@@ -51,6 +51,11 @@ final class APIClient {
     }
 
     private func perform<T: Decodable>(_ request: URLRequest) async throws -> T {
+        var request = request
+        /// Required for `auth/me`'s 401 to arrive as JSON rather than a 500 HTML
+        /// page — see CLAUDE.md's API-conventions section for why.
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+
         do {
             let (data, response) = try await session.data(for: request)
             guard let http = response as? HTTPURLResponse else {
