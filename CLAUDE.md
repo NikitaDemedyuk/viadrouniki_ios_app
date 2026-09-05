@@ -177,7 +177,8 @@ exactly the kind worth keeping.
 
 ```
 App/          ViadrounikiApp.swift, ContentView.swift (TabView), AppViewModel.swift
-Assets.xcassets/  AppIcon.appiconset (generated — see below), AccentColor, brand marks
+Assets.xcassets/  AppIcon.appiconset, splashBackground/splashLogo (generated — see below),
+              AccentColor, brand marks
 Localizable.xcstrings   String Catalog (source language en; ru + be translations)
 Models/       Trip, Point, Vehicle, AppUser, APIResponse, PhotoResource,
               AttractionType, PointFilterKey, AppLanguage
@@ -189,13 +190,17 @@ Utilities/    AuthTokenStore, KeychainStore
 
 `IconSource/` sits at the **repo root** — a sibling of the synchronized `viadrouniki_ios_app/`
 folder, not inside it — so the icon's source art and generator are versioned without ever
-being swept into the app bundle.
+being swept into the app bundle. `Config/Info.plist` sits there for the same reason: it holds
+only the `UILaunchScreen` dict (see "Launch screen" below), and putting it inside the
+synchronized folder would risk Xcode also picking it up as a bundle resource.
 
-## App icon — generated, do not hand-edit
+## App icon and splash logo — generated, do not hand-edit
 
 The three PNGs in `viadrouniki_ios_app/Assets.xcassets/AppIcon.appiconset/`
-(`AppIcon-light.png`, `AppIcon-dark.png`, `AppIcon-tinted.png`) are **build output, not
-authored artwork.** They are produced from `IconSource/viadrouniki_icon.svg` by
+(`AppIcon-light.png`, `AppIcon-dark.png`, `AppIcon-tinted.png`), and the two SVGs in
+`viadrouniki_ios_app/Assets.xcassets/splashLogo.imageset/` (`splashLogo-light.svg`,
+`splashLogo-dark.svg`, used by the launch screen — see "Launch screen" below) are **build
+output, not authored artwork.** They are produced from `IconSource/viadrouniki_icon.svg` by
 `IconSource/make-app-icon.py` (needs `pip3 install pillow`; **macOS only** — it
 rasterises through `qlmanage`, since the repo carries no other build tooling):
 
@@ -203,11 +208,12 @@ rasterises through `qlmanage`, since the repo carries no other build tooling):
 python3 IconSource/make-app-icon.py
 ```
 
-Retouching a PNG in an image editor is silently undone the next time anyone runs that script
-— no conflict, no warning. Change the SVG, or the script's constants, and regenerate instead.
+Retouching a PNG or SVG by hand is silently undone the next time anyone runs that script — no
+conflict, no warning. Change the source SVG, or the script's constants, and regenerate instead.
 The script strips the source SVG's own rounded rect (iOS applies its own, larger squircle
-mask) and scales the glyph to 75% about the canvas centre; at 100% it spans 82% of the canvas
-height and reads as cramped inside the mask.
+mask) and scales the glyph to 75% about the canvas centre for the icon (67% for the splash
+logo — it isn't masked, so it can afford to run closer to true size); at 100% the glyph spans
+82% of the canvas height and reads as cramped inside the icon's mask.
 
 **The glyph's centre is measured, not hardcoded** — the script renders the path once on its
 own and takes its bounding box, so editing the SVG cannot leave a stale centre behind. That
@@ -233,6 +239,41 @@ so the dark tile was always Apple's auto-derivation. There is no CLI to verify a
 (`--export-preview` just launches the GUI). The format's value is per-layer Liquid Glass on
 layered art; this icon is a single flat glyph, so the appiconset costs nothing — iOS still
 applies its own glass treatment to the flat image.
+
+## Launch screen
+
+The native launch screen (white/`#1C1C1E` background, centred «В» glyph) is configured in
+**`Config/Info.plist`** — a `UILaunchScreen` dict naming `splashBackground` and `splashLogo`,
+the two generated assets described above.
+
+**Xcode exposes no build setting for the launch screen's colour or image** — only
+`INFOPLIST_KEY_UILaunchScreen_Generation`, which forces an *empty* `UILaunchScreen` dict.
+That is why a real `Info.plist` exists at all here, and why the target config carries
+`INFOPLIST_FILE = Config/Info.plist` instead. `GENERATE_INFOPLIST_FILE = YES` stays on
+alongside it — Xcode merges the generated `INFOPLIST_KEY_*` values (`CFBundleDisplayName` and
+so on) into the provided file rather than treating the two as exclusive.
+
+`INFOPLIST_KEY_UILaunchScreen_Generation` was **removed** from both the Debug and Release
+configs on purpose: a generated key wins over file content, so leaving it in would silently
+overwrite the populated dict with an empty one and blank the launch screen. Don't re-add it.
+
+`ViadrounikiApp` also shows a matching SwiftUI `SplashView` as a `WindowGroup` `.overlay`
+that fades out shortly after launch, so the native screen's hand-off to the running app is
+animated rather than an abrupt cut. It is an `.overlay`, not `.id()` — the comment already
+in that file explains why `.id()` is off the table on this root: it would read as
+`ContentView` disappearing and drop every `NavigationStack` path and scroll position.
+
+**`SplashView`'s glyph carries a hardcoded `.offset(y: -14)`.** Without it, the `Image` in
+that `.overlay` renders the *exact* same size as the native screen's (confirmed pixel-for-pixel:
+both 528×293px at 3x on iPhone 17) but 42px/14pt lower — a gap that didn't trace back to safe
+area insets (`GeometryReader`'s `proxy.safeAreaInsets` measured zero from inside that overlay,
+so a computed insets-based correction wasn't available; the fixed offset is what's left).
+Verified by capturing both screens with `xcrun simctl io <udid> screenshot` (holding each on
+screen past its normal duration, since the OS swaps the launch screen out the instant SwiftUI's
+first frame commits) and comparing glyph bounding boxes with Pillow — see the comment at the
+call site for the exact numbers. **Re-verify the same way** rather than eyeballing it if the
+splash is ever restructured (a different overlay depth, a new intermediate container) or a
+new device class needs checking; nothing here guarantees the 14pt holds outside this setup.
 
 ## Shared types — reuse, never redeclare
 

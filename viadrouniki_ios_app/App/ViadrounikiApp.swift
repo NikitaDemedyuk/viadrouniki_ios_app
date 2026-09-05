@@ -3,6 +3,7 @@ import SwiftUI
 @main
 struct ViadrounikiApp: App {
     @State private var appViewModel: AppViewModel
+    @State private var isShowingSplash = true
 
     init() {
         #if DEBUG
@@ -30,6 +31,21 @@ struct ViadrounikiApp: App {
                 // destroying the tree, which also drops every navigation path
                 // and scroll position.
                 .environment(\.locale, appViewModel.language.locale)
+                /// An overlay, not `.id()`: the latter would remount `ContentView`
+                /// itself, which reads as the root disappearing and drops every
+                /// `NavigationStack` path and scroll position along with it.
+                .overlay {
+                    if isShowingSplash {
+                        SplashView()
+                            .transition(.opacity)
+                            .task {
+                                try? await Task.sleep(for: .seconds(0.6))
+                                withAnimation(.easeOut(duration: 0.35)) {
+                                    isShowingSplash = false
+                                }
+                            }
+                    }
+                }
         }
     }
 }
