@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Regenerate the three AppIcon appearance PNGs from viadrouniki_icon.svg.
+"""Regenerate the AppIcon appearance PNGs and splash-logo SVGs from viadrouniki_icon.svg.
 
 The source art is a white rounded rect behind a black glyph. iOS applies its own
 squircle mask and appearance treatment, so the rect is dropped here and each
@@ -42,6 +42,10 @@ VARIANTS = {                              # name: (background, glyph)
     "dark":   ("#1C1C1E", "#FFFFFF"),
     "tinted": ("#000000", "#FFFFFF"),
 }
+SPLASH_DEST = ROOT / "viadrouniki_ios_app/Assets.xcassets/splashLogo.imageset"
+SPLASH_CANVAS = 320                       # points; the imageset's intrinsic size
+SPLASH_SCALE = 0.67                       # glyph fills ~55% of the canvas, centred
+SPLASH_VARIANTS = {"light": "#000000", "dark": "#FFFFFF"}  # glyph colour only — no background
 
 
 def about_centre(scale):
@@ -113,3 +117,15 @@ for name, (bg, fg) in VARIANTS.items():
                     f'<path fill="{fg}" fill-rule="nonzero" d="{glyph}"/></g>')
     im.save(DEST / f"AppIcon-{name}.png", "PNG", optimize=True)
     print(f"AppIcon-{name}.png")
+
+for name, fg in SPLASH_VARIANTS.items():
+    svg_out = (
+        f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {VIEWBOX} {VIEWBOX}" '
+        f'width="{SPLASH_CANVAS}" height="{SPLASH_CANVAS}">'
+        f'<g transform="translate({VIEWBOX // 2} {VIEWBOX // 2}) scale({SPLASH_SCALE}) '
+        f'translate({-cx} {-cy})">'
+        f'<path fill="{fg}" fill-rule="nonzero" d="{glyph}"/></g></svg>'
+    )
+    out_path = SPLASH_DEST / f"splashLogo-{name}.svg"
+    out_path.write_text(svg_out)
+    print(f"splashLogo-{name}.svg")
