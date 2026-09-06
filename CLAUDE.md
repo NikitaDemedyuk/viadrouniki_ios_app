@@ -45,6 +45,38 @@ write unit tests or suggest test files until one is added.
 The project uses `PBXFileSystemSynchronizedRootGroup`: new `.swift` files dropped into the
 right folder are picked up automatically, with no `project.pbxproj` editing.
 
+## Branches
+
+`develop` is the integration branch and **the base for every PR** — every merged PR so far
+targets it. It is also the repo's default branch on GitHub, so `gh pr create` picks the right
+base with no `--base` flag.
+
+`main` is release-only and **deliberately frozen** at the initial Xcode template (2 commits),
+falling further behind `develop` with every merge. It is not stale by neglect — nothing has
+been released yet, and it moves forward when a first release is cut. Don't "catch it up" to
+`develop` as a tidying step.
+
+**There is no `master`, and its absence is intentional.** The repo was initialized on GitHub
+with a README, then a local repo carrying its own independent root was pushed on top, so
+`master` ended up an orphan sharing **no history** with the project — `git merge-base` against
+`develop` returned nothing, and merging it would have required `--allow-unrelated-histories`.
+It held only a one-line `README.md` and a stock Swift `.gitignore` that `develop` already has
+its own copy of, so it was deleted rather than merged (its tip was `8ed2f4c`, recoverable from
+GitHub for a while if that ever proves wrong). It was also the default branch until then, which
+is why tooling — `gh`, and Claude Code's own session context — used to report `master` as this
+project's main branch. Don't recreate it, and treat any tool that still names it as working
+from a cached view.
+
+Feature branches follow `feature/<slug>`, with `fix/<slug>` and `docs/<slug>` also in use.
+GitHub deletes them on merge, so a `feature/*` ref surviving locally is stale. **`git fetch
+--prune` does not clear it** — `--prune` only drops the remote-tracking ref
+(`origin/feature/<slug>`); the local branch is untouched and needs `git branch -d`. In bulk,
+once everything is merged:
+
+```bash
+git branch --merged origin/develop | grep -vE 'develop|main' | xargs git branch -d
+```
+
 ## Architecture
 
 MVVM with the Observation framework. Dependencies point downward only:
