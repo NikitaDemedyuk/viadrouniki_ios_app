@@ -1,0 +1,20 @@
+# SwiftFormat configuration for viadrouniki
+# Pin: SwiftFormat 0.62.1 (see Mintfile)
+
+--swiftversion 6.0
+
+# Formatting only — no semantic changes
+--indent 4
+--maxwidth 120
+--wraparguments before-first
+--wrapparameters before-first
+--wrapcollections before-first
+--commas always
+--trailingclosures
+
+# Removes redundant self. — review the diff before keeping this.
+# Drop this line on the first run if you want a smaller diff.
+--self remove
+
+# Never format generated code or dependencies
+--exclude Pods,Generated,.build
