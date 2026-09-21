@@ -7,10 +7,10 @@ enum KeychainStore {
     static func save(key: String, value: String) {
         guard let data = value.data(using: .utf8) else { return }
         let query: [CFString: Any] = [
-            kSecClass:        kSecClassGenericPassword,
-            kSecAttrService:  service,
-            kSecAttrAccount:  key,
-            kSecValueData:    data
+            kSecClass: kSecClassGenericPassword,
+            kSecAttrService: service,
+            kSecAttrAccount: key,
+            kSecValueData: data,
         ]
         SecItemDelete(query as CFDictionary)
         SecItemAdd(query as CFDictionary, nil)
@@ -18,11 +18,11 @@ enum KeychainStore {
 
     static func read(key: String) -> String? {
         let query: [CFString: Any] = [
-            kSecClass:        kSecClassGenericPassword,
-            kSecAttrService:  service,
-            kSecAttrAccount:  key,
-            kSecReturnData:   true,
-            kSecMatchLimit:   kSecMatchLimitOne
+            kSecClass: kSecClassGenericPassword,
+            kSecAttrService: service,
+            kSecAttrAccount: key,
+            kSecReturnData: true,
+            kSecMatchLimit: kSecMatchLimitOne,
         ]
         var result: AnyObject?
         SecItemCopyMatching(query as CFDictionary, &result)
@@ -32,9 +32,9 @@ enum KeychainStore {
 
     static func delete(key: String) {
         let query: [CFString: Any] = [
-            kSecClass:       kSecClassGenericPassword,
+            kSecClass: kSecClassGenericPassword,
             kSecAttrService: service,
-            kSecAttrAccount: key
+            kSecAttrAccount: key,
         ]
         SecItemDelete(query as CFDictionary)
     }
