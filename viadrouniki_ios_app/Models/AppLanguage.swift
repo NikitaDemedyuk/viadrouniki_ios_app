@@ -15,10 +15,14 @@ nonisolated enum AppLanguage: String, CaseIterable, Identifiable {
     case russian = "ru"
     case belarusian = "be"
 
-    var id: String { rawValue }
+    var id: String {
+        rawValue
+    }
 
     /// Drives SwiftUI's `LocalizedStringKey` lookup, via `\.locale` on the view tree.
-    var locale: Locale { Locale(identifier: rawValue) }
+    var locale: Locale {
+        Locale(identifier: rawValue)
+    }
 
     /// The `.lproj` bundle holding this language's strings.
     ///
@@ -35,7 +39,9 @@ nonisolated enum AppLanguage: String, CaseIterable, Identifiable {
 
     /// The API's `locale` query param. A passthrough rather than a mapping table
     /// because the API happens to use the same codes as the bundle localizations.
-    var apiLocale: String { rawValue }
+    var apiLocale: String {
+        rawValue
+    }
 
     /// Resolves a catalog key to a `String` in this language, bypassing SwiftUI's
     /// `LocalizedStringKey` machinery.
@@ -59,7 +65,7 @@ nonisolated enum AppLanguage: String, CaseIterable, Identifiable {
     /// currently selected one, so either option is readable to either audience.
     var nativeName: String {
         switch self {
-        case .russian:    "Русский"
+        case .russian: "Русский"
         case .belarusian: "Беларуская"
         }
     }
