@@ -63,7 +63,7 @@ struct VehicleListView: View {
 
     @ViewBuilder
     private var content: some View {
-        if viewModel.isLoading && viewModel.vehicles.isEmpty {
+        if viewModel.isLoading, viewModel.vehicles.isEmpty {
             ProgressView()
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
         } else if let error = viewModel.errorMessage, viewModel.vehicles.isEmpty {

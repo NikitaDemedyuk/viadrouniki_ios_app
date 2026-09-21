@@ -13,7 +13,6 @@ struct TripCardView: View {
             coverImage
 
             VStack(alignment: .leading, spacing: 8) {
-
                 Text(trip.title)
                     .font(.headline)
                     .foregroundStyle(.primary)
@@ -76,7 +75,7 @@ struct TripCardView: View {
     private var formattedDate: String {
         let dayMonthYear = Date.FormatStyle.dateTime.day().month(.abbreviated).year().locale(locale)
         guard let end = trip.endDate,
-            !Calendar.current.isDate(end, inSameDayAs: trip.startDate)
+              !Calendar.current.isDate(end, inSameDayAs: trip.startDate)
         else {
             return trip.startDate.formatted(dayMonthYear)
         }
@@ -86,5 +85,4 @@ struct TripCardView: View {
             : trip.startDate.formatted(dayMonthYear)
         return "\(start) – \(end.formatted(dayMonthYear))"
     }
-
 }

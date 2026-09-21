@@ -22,8 +22,8 @@ struct ProfileView: View {
                     settingsRow
                 }
 
-                /// The token lives in the Keychain, which survives app deletion,
-                /// so without this row a signed-in user has no way back out.
+                // The token lives in the Keychain, which survives app deletion,
+                // so without this row a signed-in user has no way back out.
                 if appViewModel.isLoggedIn {
                     Section {
                         Button("Sign out", role: .destructive) {
@@ -33,18 +33,18 @@ struct ProfileView: View {
                 }
             }
             .listStyle(.insetGrouped)
-            /// See `AppLanguage.localized(_:)` — this is the currently-visible
-            /// screen's own root title, and it needs the same pre-resolved
-            /// treatment as a pushed destination's: a plain `LocalizedStringKey`
-            /// literal here also goes stale on a language change.
+            // See `AppLanguage.localized(_:)` — this is the currently-visible
+            // screen's own root title, and it needs the same pre-resolved
+            // treatment as a pushed destination's: a plain `LocalizedStringKey`
+            // literal here also goes stale on a language change.
             .navigationTitle(appViewModel.language.localized("Profile"))
             .refreshable { await load() }
             .sheet(isPresented: $isProfileLoginPresented) {
                 ProfileLoginView()
             }
         }
-        /// Keyed on `isLoggedIn`, not `\.locale` — neither request takes a
-        /// `locale` param or returns server-localized text. See CLAUDE.md.
+        // Keyed on `isLoggedIn`, not `\.locale` — neither request takes a
+        // `locale` param or returns server-localized text. See CLAUDE.md.
         .task(id: appViewModel.isLoggedIn) {
             if appViewModel.isLoggedIn {
                 await load()
@@ -76,8 +76,8 @@ struct ProfileView: View {
                     ProfileBannerRow(user: user)
                 }
             } else {
-                /// Inert while loading or after a failure — pushing an account
-                /// screen with no account to show would be worse than waiting.
+                // Inert while loading or after a failure — pushing an account
+                // screen with no account to show would be worse than waiting.
                 ProfileBannerRow(user: nil)
                     .overlay(alignment: .trailing) {
                         if viewModel.isLoading {
@@ -121,14 +121,13 @@ struct ProfileView: View {
     /// styled like `settingsRow`, with an empty action until that screen and
     /// its navigation are built.
     private var myCarsRow: some View {
-        Button {
-        } label: {
+        Button {} label: {
             HStack {
                 iconRow(systemImage: "car.fill", tint: .blue, title: "My cars")
                 Spacer()
-                /// `NavigationLink` draws this automatically; this row is a
-                /// plain `Button` since there's no destination yet, so it's
-                /// added by hand to match `settingsRow`'s look.
+                // `NavigationLink` draws this automatically; this row is a
+                // plain `Button` since there's no destination yet, so it's
+                // added by hand to match `settingsRow`'s look.
                 Image(systemName: "chevron.right")
                     .font(.footnote.weight(.semibold))
                     .foregroundStyle(.tertiary)

@@ -103,7 +103,7 @@ struct TripDetailView: View {
     private var formattedDateRange: String {
         let dayMonthYear = Date.FormatStyle.dateTime.day().month(.abbreviated).year().locale(locale)
         guard let end = displayedTrip.endDate,
-            !Calendar.current.isDate(end, inSameDayAs: displayedTrip.startDate)
+              !Calendar.current.isDate(end, inSameDayAs: displayedTrip.startDate)
         else {
             return displayedTrip.startDate.formatted(dayMonthYear)
         }

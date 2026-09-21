@@ -22,7 +22,7 @@ struct TripListView: View {
 
     @ViewBuilder
     private var content: some View {
-        if viewModel.isLoading && viewModel.trips.isEmpty {
+        if viewModel.isLoading, viewModel.trips.isEmpty {
             ProgressView()
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
         } else if let error = viewModel.errorMessage, viewModel.trips.isEmpty {

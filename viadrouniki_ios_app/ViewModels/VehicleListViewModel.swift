@@ -50,7 +50,7 @@ final class VehicleListViewModel {
 
     func fetchMoreIfNeeded(currentVehicle: Vehicle) async {
         guard hasMorePages, !isFetchingMore, !isLoading,
-            vehicles.last?.id == currentVehicle.id
+              vehicles.last?.id == currentVehicle.id
         else { return }
 
         isFetchingMore = true

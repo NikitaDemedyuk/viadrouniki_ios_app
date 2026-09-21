@@ -30,8 +30,8 @@ final class ProfileViewModel {
             user = response
         } catch APIError.unauthorized {
             guard generation == loadGeneration else { return }
-            /// Not an error to display: the token is stale, so the screen falls
-            /// back to the signed-out banner rather than a dead end.
+            // Not an error to display: the token is stale, so the screen falls
+            // back to the signed-out banner rather than a dead end.
             user = nil
             errorMessage = nil
             sessionExpired = true
