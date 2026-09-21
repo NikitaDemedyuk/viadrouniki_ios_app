@@ -20,11 +20,15 @@ enum APIError: Error, LocalizedError {
         switch self {
         case .unauthorized:
             return String(localized: "Unauthorized. Please log in again.", bundle: bundle, locale: locale)
-        case .serverError(let code):
+        case let .serverError(code):
             return String(localized: "Server error (\(code)).", bundle: bundle, locale: locale)
-        case .decodingError(let error):
-            return String(localized: "Failed to parse response: \(error.localizedDescription)", bundle: bundle, locale: locale)
-        case .networkError(let error):
+        case let .decodingError(error):
+            return String(
+                localized: "Failed to parse response: \(error.localizedDescription)",
+                bundle: bundle,
+                locale: locale
+            )
+        case let .networkError(error):
             return String(localized: "Network error: \(error.localizedDescription)", bundle: bundle, locale: locale)
         }
     }

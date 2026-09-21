@@ -21,12 +21,12 @@ extension APIClient {
     ) async throws -> PaginatedResponse<Trip> {
         let url =
             baseURL
-            .appending(path: "cars/\(id)/trips")
-            .appending(queryItems: [
-                URLQueryItem(name: "per_page", value: "\(perPage)"),
-                URLQueryItem(name: "locale", value: locale),
-                URLQueryItem(name: "page", value: "\(page)"),
-            ])
+                .appending(path: "cars/\(id)/trips")
+                .appending(queryItems: [
+                    URLQueryItem(name: "per_page", value: "\(perPage)"),
+                    URLQueryItem(name: "locale", value: locale),
+                    URLQueryItem(name: "page", value: "\(page)"),
+                ])
         return try await get(url: url)
     }
 
@@ -43,10 +43,10 @@ extension APIClient {
     func fetchMyCars(perPage: Int = 100) async throws -> PaginatedResponse<Vehicle> {
         let url =
             baseURL
-            .appending(path: "user/cars")
-            .appending(queryItems: [
-                URLQueryItem(name: "per_page", value: "\(perPage)")
-            ])
+                .appending(path: "user/cars")
+                .appending(queryItems: [
+                    URLQueryItem(name: "per_page", value: "\(perPage)"),
+                ])
         return try await get(url: url, requiresAuth: true)
     }
 
@@ -58,13 +58,13 @@ extension APIClient {
     ) async throws -> PaginatedResponse<Vehicle> {
         let url =
             baseURL
-            .appending(path: "cars")
-            .appending(queryItems: [
-                URLQueryItem(name: "sort_by", value: sortBy.rawValue),
-                URLQueryItem(name: "sort_order", value: sortOrder.rawValue),
-                URLQueryItem(name: "per_page", value: "\(perPage)"),
-                URLQueryItem(name: "page", value: "\(page)"),
-            ])
+                .appending(path: "cars")
+                .appending(queryItems: [
+                    URLQueryItem(name: "sort_by", value: sortBy.rawValue),
+                    URLQueryItem(name: "sort_order", value: sortOrder.rawValue),
+                    URLQueryItem(name: "per_page", value: "\(perPage)"),
+                    URLQueryItem(name: "page", value: "\(page)"),
+                ])
         return try await get(url: url)
     }
 }
