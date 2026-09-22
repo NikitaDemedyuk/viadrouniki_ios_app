@@ -1,0 +1,30 @@
+#!/bin/sh
+# Pre-commit hook: block a commit if any STAGED Swift file needs formatting.
+# Uses the repo-pinned SwiftFormat (see Mintfile / .swiftformat).
+# Bypass in a genuine emergency with:  git commit --no-verify
+#
+# One-time per clone (not versioned, lives in .git/config):
+#   git config core.hooksPath Tools/git-hooks
+
+# 1. If SwiftFormat is not installed, warn but do not block (matches Build Phase).
+if ! which swiftformat >/dev/null 2>&1; then
+  echo "warning: SwiftFormat not installed — skipping pre-commit lint."
+  echo "         install: brew install swiftformat   (or: mint bootstrap)"
+  exit 0
+fi
+
+# 2. Only the Swift files staged for THIS commit (Added / Copied / Modified).
+staged=$(git diff --cached --name-only --diff-filter=ACM -- '*.swift')
+if [ -z "$staged" ]; then
+  exit 0
+fi
+
+# 3. Lint them. No --lenient here: a violation must exit non-zero and abort the commit.
+echo "$staged" | tr '\n' '\0' | xargs -0 swiftformat --lint
+if [ $? -ne 0 ]; then
+  echo ""
+  echo "error: SwiftFormat found unformatted code in staged files."
+  echo "       fix: swiftformat .   then re-stage (git add) and commit again."
+  exit 1
+fi
+exit 0
