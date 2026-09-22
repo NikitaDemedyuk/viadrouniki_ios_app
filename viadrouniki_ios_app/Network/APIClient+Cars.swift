@@ -16,7 +16,8 @@ extension APIClient {
     func fetchCarTrips(
         id: Int,
         page: Int = 1,
-        perPage: Int = 12, locale: String = AppLanguage.current.apiLocale
+        perPage: Int = 12,
+        locale: String = AppLanguage.current.apiLocale
     ) async throws -> PaginatedResponse<Trip> {
         let url =
             baseURL
