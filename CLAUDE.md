@@ -191,12 +191,25 @@ View (SwiftUI struct)
 
 ## Comments
 
-**Use `///` only — never bare `//`.** This applies everywhere, not just above
-declarations: a `///` explaining one line inside a function body is correct, a
-`//` doing the same is not. The exceptions are Xcode's special tags —
-`// MARK: -`, `// TODO:`, `// FIXME:` — because the jump bar and the tag
-scanner only recognize the double-slash form; tripling any of them silently
-stops it from being picked up as navigation or as a flagged to-do.
+**Standard Swift convention: `///` documents a declaration, `//` explains a line.**
+A `///` comment directly above a type, property, method or case becomes that
+symbol's documentation — it shows up in Quick Help and on option-click. A comment
+anywhere else — inside a function body, above a statement, beside a modifier in a
+SwiftUI chain — is a plain `//`. Xcode's special tags (`// MARK: -`, `// TODO:`,
+`// FIXME:`) are always `//`; tripling any of them stops the jump bar and the tag
+scanner from picking it up.
+
+This is enforced mechanically by SwiftFormat's `docComments` rule (see
+`.swiftformat`), so hand-written slashes get normalised on the next run either way.
+**One trap comes with that:** the rule decides by *position*, not by meaning, so a
+`//` note that happens to sit directly above a declaration is promoted to `///`
+and silently becomes that symbol's documentation. `SettingsView` hit this: a note
+explaining its `.navigationTitle` call sat above
+`@Environment(AppViewModel.self) private var appViewModel`, so the formatter turned
+it into that property's documentation. When a comment is about something other than
+the declaration beneath it, move it next to what it actually describes rather than
+fighting the formatter — the `SettingsView` note now sits directly on the
+`.navigationTitle` modifier.
 
 Default to writing no comment at all. Add one only when the WHY is genuinely
 non-obvious — a hidden backend behavior, a race avoided on purpose, a
