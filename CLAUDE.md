@@ -45,6 +45,45 @@ write unit tests or suggest test files until one is added.
 The project uses `PBXFileSystemSynchronizedRootGroup`: new `.swift` files dropped into the
 right folder are picked up automatically, with no `project.pbxproj` editing.
 
+## Formatting
+
+Swift is formatted with SwiftFormat, **pinned to `0.62.1` in `Mintfile`** and configured by
+`.swiftformat` at the repo root. The tree is currently lint-clean.
+
+```bash
+swiftformat .          # format everything
+swiftformat --lint .   # check only, exits non-zero on violations
+```
+
+- **The pin is the version the tree was formatted with**, and output differs between
+  versions — a different SwiftFormat reformats files nobody touched. **Homebrew does not
+  honour the pin:** `brew install`/`brew upgrade` give the latest release, already `0.63.0`.
+  Get exactly `0.62.1` from the `swiftformat.zip` asset of its GitHub release, and on an
+  existing Homebrew `0.62.1` run `brew pin swiftformat` so an upgrade can't move it. Mint is
+  what the `Mintfile` is for, but the hook deliberately doesn't call `mint run`: on this
+  machine the Homebrew `mint` is x86_64 and fails to link when building (see the hook header).
+- **Pre-commit hook: `Tools/git-hooks/pre-commit`, opt-in per clone.** Enable it with
+  `git config core.hooksPath Tools/git-hooks`. That setting lives in `.git/config` and isn't
+  versioned, so a fresh clone runs **no** hook until someone sets it. The hook exits 1 if
+  `swiftformat` is missing or its `--version` differs from the `Mintfile` pin, then runs
+  `swiftformat --lint` on the staged `.swift` files. Emergency bypass: `git commit --no-verify`.
+  Two known gaps:
+  - It lints the **working-tree** copy of each staged file, not the staged content, so a
+    partially staged file can be judged on the wrong content in either direction.
+  - The version check runs before it looks at what's staged, so a commit with no Swift files
+    at all is still blocked by a missing or mismatched SwiftFormat.
+- **There is no Xcode Build Phase for it.** `xcodebuild` passes on unformatted code; the hook
+  is the only gate.
+- **A format run can change declarations, not just whitespace** — review its diff like code.
+  `opaqueGenericParameters` rewrote `APIClient.post`'s named generic `B: Encodable` into
+  `(some Encodable)?`; `docComments` swaps `//` and `///` by position (see "Comments");
+  `--self remove` strips redundant `self.`; `redundantReturn` drops `return` from
+  single-expression `switch` cases; and `if a && b` becomes `if a, b`.
+- **`--swiftversion 6.0` in `.swiftformat` does not match `SWIFT_VERSION = 5.0`.** It only
+  tells SwiftFormat which syntax it may assume, and today `5.10` produces byte-identical
+  output. Don't "correct" it to `5.0`, though: that rewrites `await (a, b)` into
+  `await(a, b)` in the three detail views and turns off rules the tree already relies on.
+
 ## Branches
 
 `develop` is the integration branch and **the base for every PR** — every merged PR so far
@@ -238,6 +277,8 @@ folder, not inside it — so the icon's source art and generator are versioned w
 being swept into the app bundle. `Config/Info.plist` sits there for the same reason: it holds
 only the `UILaunchScreen` dict (see "Launch screen" below), and putting it inside the
 synchronized folder would risk Xcode also picking it up as a bundle resource.
+`.swiftformat`, `Mintfile` and `Tools/git-hooks/` sit at the repo root as well, for the same
+reason — see "Formatting".
 
 ## App icon and splash logo — generated, do not hand-edit
 
