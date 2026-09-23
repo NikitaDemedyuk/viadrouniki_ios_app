@@ -43,32 +43,32 @@ struct Trip: Identifiable, Codable, Hashable {
 
     enum CodingKeys: String, CodingKey {
         case id, title, subtitle, number, slug, status, rating, photos, attractions
-        case tripDescription        = "description"
-        case rawExternalLinks       = "external_links"
-        case routeLengthKm          = "route_length_km"
-        case startDate              = "start_date"
-        case endDate                = "end_date"
-        case meetingPoint           = "meeting_point"
-        case meetingPointLatitude   = "meeting_point_latitude"
-        case meetingPointLongitude  = "meeting_point_longitude"
-        case meetingTime            = "meeting_time"
+        case tripDescription = "description"
+        case rawExternalLinks = "external_links"
+        case routeLengthKm = "route_length_km"
+        case startDate = "start_date"
+        case endDate = "end_date"
+        case meetingPoint = "meeting_point"
+        case meetingPointLatitude = "meeting_point_latitude"
+        case meetingPointLongitude = "meeting_point_longitude"
+        case meetingTime = "meeting_time"
         case applicationApprovedExtra = "application_approved_extra"
-        case applicationsDeadline   = "applications_deadline"
-        case isPublic               = "is_public"
-        case maxParticipants        = "max_participants"
-        case currentParticipants    = "current_participants"
-        case attractionsCount       = "attractions_count"
-        case applicationsCount      = "applications_count"
-        case photosCount            = "photos_count"
-        case carsCount              = "cars_count"
-        case ratingsCount           = "ratings_count"
-        case organizer              = "user"
-        case mainPhoto              = "main_photo"
-        case isActive               = "is_active"
-        case canAcceptApplications  = "can_accept_applications"
-        case canSubmitApplication   = "can_submit_application"
-        case createdAt              = "created_at"
-        case updatedAt              = "updated_at"
+        case applicationsDeadline = "applications_deadline"
+        case isPublic = "is_public"
+        case maxParticipants = "max_participants"
+        case currentParticipants = "current_participants"
+        case attractionsCount = "attractions_count"
+        case applicationsCount = "applications_count"
+        case photosCount = "photos_count"
+        case carsCount = "cars_count"
+        case ratingsCount = "ratings_count"
+        case organizer = "user"
+        case mainPhoto = "main_photo"
+        case isActive = "is_active"
+        case canAcceptApplications = "can_accept_applications"
+        case canSubmitApplication = "can_submit_application"
+        case createdAt = "created_at"
+        case updatedAt = "updated_at"
     }
 }
 
@@ -96,7 +96,7 @@ struct TripOrganizer: Codable, Hashable {
     enum CodingKeys: String, CodingKey {
         case id, name, instagram
         case firstName = "first_name"
-        case lastName  = "last_name"
+        case lastName = "last_name"
     }
 }
 
@@ -179,13 +179,13 @@ struct TripAttraction: Identifiable, Codable, Hashable {
 
     enum CodingKeys: String, CodingKey {
         case name, slug, address, latitude, longitude, visited, type
-        case id                   = "trip_attraction_id"
-        case attractionId         = "id"
+        case id = "trip_attraction_id"
+        case attractionId = "id"
         case attractionDescription = "description"
-        case rawExternalLinks     = "external_links"
-        case visitedAt            = "visited_at"
-        case sortOrder            = "sort_order"
-        case tripsCount           = "trips_count"
+        case rawExternalLinks = "external_links"
+        case visitedAt = "visited_at"
+        case sortOrder = "sort_order"
+        case tripsCount = "trips_count"
     }
 }
 

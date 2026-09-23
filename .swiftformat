@@ -1,0 +1,15 @@
+# SwiftFormat configuration for viadrouniki
+# Pin: SwiftFormat 0.62.1 (see Mintfile)
+
+--swiftversion 6.0
+
+# Not whitespace-only: some rules rewrite declarations (e.g. generics into `some`),
+# so review a format run's diff like code. See CLAUDE.md "Formatting".
+--indent 4
+--maxwidth 120
+--wraparguments before-first
+--wrapparameters before-first
+--wrapcollections before-first
+--commas always
+--trailingclosures
+--self remove

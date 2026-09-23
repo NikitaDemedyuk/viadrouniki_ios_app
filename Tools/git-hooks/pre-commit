@@ -1,0 +1,35 @@
+#!/bin/sh
+# Pre-commit: lint STAGED Swift files, enforcing the SwiftFormat version pinned in Mintfile.
+# Emergency bypass:  git commit --no-verify
+#
+# Why a version check and not `mint run`: honoring the pin via `mint run` needs a
+# native (arm64) Homebrew here; the installed mint is x86_64 and its build fails to
+# link. So instead we verify the SwiftFormat on $PATH matches the Mintfile pin and
+# refuse to run on a mismatch — no silent drift, no new toolchain to set up.
+
+repo_root=$(git rev-parse --show-toplevel)
+pinned=$(sed -n 's|.*SwiftFormat@||p' "$repo_root/Mintfile" | head -1 | tr -d '[:space:]')
+
+if ! command -v swiftformat >/dev/null 2>&1; then
+  echo "error: SwiftFormat not installed. Mintfile pins $pinned — install that version."
+  exit 1
+fi
+
+installed=$(swiftformat --version 2>/dev/null | tr -d '[:space:]')
+if [ -n "$pinned" ] && [ "$installed" != "$pinned" ]; then
+  echo "error: SwiftFormat $installed is on \$PATH, but Mintfile pins $pinned."
+  echo "       install the pinned version so formatting stays reproducible."
+  exit 1
+fi
+
+staged=$(git diff --cached --name-only --diff-filter=ACM -- '*.swift')
+[ -z "$staged" ] && exit 0
+
+echo "$staged" | tr '\n' '\0' | xargs -0 swiftformat --lint
+if [ $? -ne 0 ]; then
+  echo ""
+  echo "error: SwiftFormat ($pinned) found unformatted code in staged files."
+  echo "       fix: swiftformat .   then re-stage and commit again."
+  exit 1
+fi
+exit 0

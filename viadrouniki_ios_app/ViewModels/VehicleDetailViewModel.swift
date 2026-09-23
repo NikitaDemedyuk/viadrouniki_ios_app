@@ -59,7 +59,7 @@ final class VehicleDetailViewModel {
 
     func fetchMoreTripsIfNeeded(currentTrip: Trip, vehicleId: Int) async {
         guard hasMoreTrips, !isFetchingMoreTrips, !isLoadingTrips,
-            trips.last?.id == currentTrip.id
+              trips.last?.id == currentTrip.id
         else { return }
 
         isFetchingMoreTrips = true

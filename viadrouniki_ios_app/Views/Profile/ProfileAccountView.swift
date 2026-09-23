@@ -24,8 +24,8 @@ struct ProfileAccountView: View {
             notificationsSection
         }
         .listStyle(.insetGrouped)
-        /// See `AppLanguage.localized(_:)` — a `LocalizedStringKey` literal here
-        /// goes stale on a language change for whichever screen is on-screen.
+        // See `AppLanguage.localized(_:)` — a `LocalizedStringKey` literal here
+        // goes stale on a language change for whichever screen is on-screen.
         .navigationTitle(appViewModel.language.localized("Account"))
         .navigationBarTitleDisplayMode(.inline)
     }
@@ -78,8 +78,8 @@ struct ProfileAccountView: View {
     @ViewBuilder
     private var telegramRow: some View {
         if user.isTelegramLinked,
-            let username = user.telegramUsername,
-            let url = URL(string: "https://t.me/\(username)")
+           let username = user.telegramUsername,
+           let url = URL(string: "https://t.me/\(username)")
         {
             linkRow(title: Text(verbatim: "Telegram"), value: Text(verbatim: "@\(username)"), url: url)
         } else {
@@ -90,7 +90,7 @@ struct ProfileAccountView: View {
     @ViewBuilder
     private var instagramRow: some View {
         if let handle = user.instagramHandle,
-            let url = URL(string: "https://www.instagram.com/\(handle)")
+           let url = URL(string: "https://www.instagram.com/\(handle)")
         {
             linkRow(title: Text(verbatim: "Instagram"), value: Text(verbatim: "@\(handle)"), url: url)
         } else {

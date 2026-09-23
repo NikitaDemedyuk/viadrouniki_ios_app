@@ -43,14 +43,20 @@ struct AppUser: Identifiable, Codable, Hashable {
 extension AppUser {
     /// `name` when the API sends one, otherwise the first/last pair joined.
     var displayName: String? {
-        if let name, !name.isEmpty { return name }
+        if let name, !name.isEmpty {
+            return name
+        }
         let parts = [firstName, lastName].compactMap(\.self).filter { !$0.isEmpty }
         return parts.isEmpty ? nil : parts.joined(separator: " ")
     }
 
-    var isEmailVerified: Bool { emailVerifiedAt != nil }
+    var isEmailVerified: Bool {
+        emailVerifiedAt != nil
+    }
 
-    var isTelegramLinked: Bool { telegramLinked == true }
+    var isTelegramLinked: Bool {
+        telegramLinked == true
+    }
 
     /// The handle without its leading `@`, ready to interpolate into a profile
     /// URL — the same normalisation `VehicleDetailView` does for an owner.

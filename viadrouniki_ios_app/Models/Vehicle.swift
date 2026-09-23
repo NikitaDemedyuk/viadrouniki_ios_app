@@ -84,10 +84,25 @@ extension Vehicle {
             year: tripCar.year,
             description: nil,
             mainPhoto: tripCar.mainPhoto.map {
-                VehiclePhoto(id: $0.id, mediaId: nil, url: $0.url, urlMobile: $0.url, alt: nil, isMain: nil, sortOrder: nil)
+                VehiclePhoto(
+                    id: $0.id,
+                    mediaId: nil,
+                    url: $0.url,
+                    urlMobile: $0.url,
+                    alt: nil,
+                    isMain: nil,
+                    sortOrder: nil
+                )
             },
             photos: nil,
-            user: VehicleOwner(id: tripCar.user.id, firstName: nil, lastName: nil, instagram: nil, name: tripCar.user.name, telegramUsername: nil),
+            user: VehicleOwner(
+                id: tripCar.user.id,
+                firstName: nil,
+                lastName: nil,
+                instagram: nil,
+                name: tripCar.user.name,
+                telegramUsername: nil
+            ),
             photosCount: 0,
             tripsCount: 0,
             isActive: true,

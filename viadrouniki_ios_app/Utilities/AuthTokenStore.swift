@@ -16,7 +16,9 @@ final class AuthTokenStore {
         }
     }
 
-    var isLoggedIn: Bool { token != nil }
+    var isLoggedIn: Bool {
+        token != nil
+    }
 
     func logout() {
         token = nil

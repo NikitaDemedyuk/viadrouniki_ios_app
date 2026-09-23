@@ -37,7 +37,7 @@ final class APIClient {
         return try await perform(request)
     }
 
-    func post<T: Decodable, B: Encodable>(url: URL, body: B? = nil as String?) async throws -> T {
+    func post<T: Decodable>(url: URL, body: (some Encodable)? = nil as String?) async throws -> T {
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
@@ -52,8 +52,8 @@ final class APIClient {
 
     private func perform<T: Decodable>(_ request: URLRequest) async throws -> T {
         var request = request
-        /// Required for `auth/me`'s 401 to arrive as JSON rather than a 500 HTML
-        /// page — see CLAUDE.md's API-conventions section for why.
+        // Required for `auth/me`'s 401 to arrive as JSON rather than a 500 HTML
+        // page — see CLAUDE.md's API-conventions section for why.
         request.setValue("application/json", forHTTPHeaderField: "Accept")
 
         do {
@@ -62,7 +62,7 @@ final class APIClient {
                 throw APIError.networkError(URLError(.badServerResponse))
             }
             switch http.statusCode {
-            case 200...299:
+            case 200 ... 299:
                 do {
                     return try decoder.decode(T.self, from: data)
                 } catch {

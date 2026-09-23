@@ -13,7 +13,7 @@ extension APIClient {
         let url = baseURL
             .appending(path: "trips/slug/\(slug)")
             .appending(queryItems: [
-                URLQueryItem(name: "locale", value: locale)
+                URLQueryItem(name: "locale", value: locale),
             ])
         let response: SingleResponse<Trip> = try await get(url: url)
         return response.data
@@ -26,7 +26,7 @@ extension APIClient {
         let url = baseURL
             .appending(path: "trips/\(id)/cars")
             .appending(queryItems: [
-                URLQueryItem(name: "locale", value: locale)
+                URLQueryItem(name: "locale", value: locale),
             ])
         let response: SingleResponse<[TripCar]> = try await get(url: url)
         return response.data
@@ -41,11 +41,11 @@ extension APIClient {
         let url = baseURL
             .appending(path: "trips")
             .appending(queryItems: [
-                URLQueryItem(name: "page",       value: "\(page)"),
-                URLQueryItem(name: "per_page",   value: "\(perPage)"),
-                URLQueryItem(name: "sort_by",    value: "start_date"),
+                URLQueryItem(name: "page", value: "\(page)"),
+                URLQueryItem(name: "per_page", value: "\(perPage)"),
+                URLQueryItem(name: "sort_by", value: "start_date"),
                 URLQueryItem(name: "sort_order", value: sortOrder.rawValue),
-                URLQueryItem(name: "locale",     value: locale)
+                URLQueryItem(name: "locale", value: locale),
             ])
         return try await get(url: url)
     }

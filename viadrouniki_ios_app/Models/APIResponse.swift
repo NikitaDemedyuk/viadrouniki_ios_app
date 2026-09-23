@@ -17,8 +17,8 @@ struct PaginationMeta: Codable {
 
     enum CodingKeys: String, CodingKey {
         case currentPage = "current_page"
-        case lastPage    = "last_page"
-        case perPage     = "per_page"
+        case lastPage = "last_page"
+        case perPage = "per_page"
         case total
     }
 }

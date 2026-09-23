@@ -197,6 +197,23 @@ Run ▸ Arguments). It's read under `#if DEBUG` only, in
 [`ViadrounikiApp.swift`](viadrouniki_ios_app/App/ViadrounikiApp.swift) — use an unshared scheme
 copy and never commit a token.
 
+### Formatting
+
+Swift is formatted with [SwiftFormat](https://github.com/nicklockwood/SwiftFormat) **0.62.1**,
+pinned in [`Mintfile`](Mintfile) and configured in [`.swiftformat`](.swiftformat). Install that
+exact version: Homebrew ships a newer one, so either take `swiftformat.zip` from the
+[0.62.1 release](https://github.com/nicklockwood/SwiftFormat/releases/tag/0.62.1), or run
+`brew pin swiftformat` on an existing 0.62.1 install. Then enable the pre-commit hook, once per
+clone:
+
+```bash
+git config core.hooksPath Tools/git-hooks
+```
+
+The hook blocks a commit whose staged Swift files need formatting (fix with `swiftformat .`, then
+re-stage), and refuses to run on any SwiftFormat other than the pinned version. Nothing checks
+formatting during an Xcode build.
+
 ### Project conventions
 
 `develop` is the integration branch and the base for every PR; feature branches follow

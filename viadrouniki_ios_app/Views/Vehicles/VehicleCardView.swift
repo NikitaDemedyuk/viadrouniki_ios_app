@@ -69,17 +69,17 @@ struct VehicleCardView: View {
 extension Vehicle {
     var scheduleIcon: String {
         switch schedule {
-        case .summer: return "sun.max.fill"
-        case .winter: return "snowflake"
-        case .unknown: return "calendar"
+        case .summer: "sun.max.fill"
+        case .winter: "snowflake"
+        case .unknown: "calendar"
         }
     }
 
     var scheduleColor: Color {
         switch schedule {
-        case .summer: return .orange
-        case .winter: return .blue
-        case .unknown: return .secondary
+        case .summer: .orange
+        case .winter: .blue
+        case .unknown: .secondary
         }
     }
 }
