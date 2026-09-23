@@ -3,7 +3,8 @@
 
 --swiftversion 6.0
 
-# Formatting only — no semantic changes
+# Not whitespace-only: some rules rewrite declarations (e.g. generics into `some`),
+# so review a format run's diff like code. See CLAUDE.md "Formatting".
 --indent 4
 --maxwidth 120
 --wraparguments before-first
@@ -11,10 +12,4 @@
 --wrapcollections before-first
 --commas always
 --trailingclosures
-
-# Removes redundant self. — review the diff before keeping this.
-# Drop this line on the first run if you want a smaller diff.
 --self remove
-
-# Never format generated code or dependencies
---exclude Pods,Generated,.build
