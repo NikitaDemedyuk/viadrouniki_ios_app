@@ -19,14 +19,13 @@ extension APIClient {
         perPage: Int = 12,
         locale: String = AppLanguage.current.apiLocale
     ) async throws -> PaginatedResponse<Trip> {
-        let url =
-            baseURL
-                .appending(path: "cars/\(id)/trips")
-                .appending(queryItems: [
-                    URLQueryItem(name: "per_page", value: "\(perPage)"),
-                    URLQueryItem(name: "locale", value: locale),
-                    URLQueryItem(name: "page", value: "\(page)"),
-                ])
+        let url = baseURL
+            .appending(path: "cars/\(id)/trips")
+            .appending(queryItems: [
+                URLQueryItem(name: "per_page", value: "\(perPage)"),
+                URLQueryItem(name: "locale", value: locale),
+                URLQueryItem(name: "page", value: "\(page)"),
+            ])
         return try await get(url: url)
     }
 
@@ -41,12 +40,11 @@ extension APIClient {
     /// `Vehicle` — keeping every `Vehicle`-returning call in one file matters
     /// more than the `user/` URL prefix.
     func fetchMyCars(perPage: Int = 100) async throws -> PaginatedResponse<Vehicle> {
-        let url =
-            baseURL
-                .appending(path: "user/cars")
-                .appending(queryItems: [
-                    URLQueryItem(name: "per_page", value: "\(perPage)"),
-                ])
+        let url = baseURL
+            .appending(path: "user/cars")
+            .appending(queryItems: [
+                URLQueryItem(name: "per_page", value: "\(perPage)"),
+            ])
         return try await get(url: url, requiresAuth: true)
     }
 
@@ -56,15 +54,14 @@ extension APIClient {
         sortBy: CarSortField = .year,
         sortOrder: SortOrder = .asc
     ) async throws -> PaginatedResponse<Vehicle> {
-        let url =
-            baseURL
-                .appending(path: "cars")
-                .appending(queryItems: [
-                    URLQueryItem(name: "sort_by", value: sortBy.rawValue),
-                    URLQueryItem(name: "sort_order", value: sortOrder.rawValue),
-                    URLQueryItem(name: "per_page", value: "\(perPage)"),
-                    URLQueryItem(name: "page", value: "\(page)"),
-                ])
+        let url = baseURL
+            .appending(path: "cars")
+            .appending(queryItems: [
+                URLQueryItem(name: "sort_by", value: sortBy.rawValue),
+                URLQueryItem(name: "sort_order", value: sortOrder.rawValue),
+                URLQueryItem(name: "per_page", value: "\(perPage)"),
+                URLQueryItem(name: "page", value: "\(page)"),
+            ])
         return try await get(url: url)
     }
 }
