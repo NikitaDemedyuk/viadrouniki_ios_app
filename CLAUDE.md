@@ -250,6 +250,11 @@ the declaration beneath it, move it next to what it actually describes rather th
 fighting the formatter — the `SettingsView` note now sits directly on the
 `.navigationTitle` modifier.
 
+**The rule also has a blind spot:** it skips a `///` block that sits directly under a
+`// TODO:` line, so a misplaced `///` there passes the hook. `ViadrounikiApp`'s DEBUG
+token-injection comment went unconverted this way until it was fixed by hand. The `//`
+form is stable in the same position, so fixing one of these by hand sticks.
+
 Default to writing no comment at all. Add one only when the WHY is genuinely
 non-obvious — a hidden backend behavior, a race avoided on purpose, a
 deliberate deviation from the pattern used elsewhere — never to restate what
