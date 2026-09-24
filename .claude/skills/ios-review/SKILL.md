@@ -29,7 +29,7 @@ Follow these steps in order. Do not skip step 1 — reviewing without building i
 1. **Verify it compiles.**
 
    ```bash
-   xcodebuild -scheme viadrouniki_ios_app -destination 'generic/platform=iOS Simulator' build
+   xcodebuild -scheme Viadrouniki -destination 'generic/platform=iOS Simulator' build
    ```
 
    There is no test target, so there are no tests to run. If no build environment is available, state this explicitly at the top of the review and manually check for hallucinated APIs (see reference checklist §5).

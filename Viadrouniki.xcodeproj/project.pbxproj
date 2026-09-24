@@ -7,13 +7,13 @@
 	objects = {
 
 /* Begin PBXFileReference section */
-		11EC65C02FFC3E9D000348AE /* viadrouniki_ios_app.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = viadrouniki_ios_app.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		11EC65C02FFC3E9D000348AE /* Viadrouniki.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Viadrouniki.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		11EC65C22FFC3E9D000348AE /* viadrouniki_ios_app */ = {
+		11EC65C22FFC3E9D000348AE /* Viadrouniki */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = viadrouniki_ios_app;
+			path = Viadrouniki;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -32,7 +32,7 @@
 		11EC65B72FFC3E9D000348AE = {
 			isa = PBXGroup;
 			children = (
-				11EC65C22FFC3E9D000348AE /* viadrouniki_ios_app */,
+				11EC65C22FFC3E9D000348AE /* Viadrouniki */,
 				11EC65C12FFC3E9D000348AE /* Products */,
 			);
 			sourceTree = "<group>";
@@ -40,7 +40,7 @@
 		11EC65C12FFC3E9D000348AE /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				11EC65C02FFC3E9D000348AE /* viadrouniki_ios_app.app */,
+				11EC65C02FFC3E9D000348AE /* Viadrouniki.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -48,9 +48,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		11EC65BF2FFC3E9D000348AE /* viadrouniki_ios_app */ = {
+		11EC65BF2FFC3E9D000348AE /* Viadrouniki */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 11EC65CB2FFC3E9E000348AE /* Build configuration list for PBXNativeTarget "viadrouniki_ios_app" */;
+			buildConfigurationList = 11EC65CB2FFC3E9E000348AE /* Build configuration list for PBXNativeTarget "Viadrouniki" */;
 			buildPhases = (
 				11EC65BC2FFC3E9D000348AE /* Sources */,
 				11EC65BD2FFC3E9D000348AE /* Frameworks */,
@@ -61,13 +61,13 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				11EC65C22FFC3E9D000348AE /* viadrouniki_ios_app */,
+				11EC65C22FFC3E9D000348AE /* Viadrouniki */,
 			);
-			name = viadrouniki_ios_app;
+			name = Viadrouniki;
 			packageProductDependencies = (
 			);
-			productName = viadrouniki_ios_app;
-			productReference = 11EC65C02FFC3E9D000348AE /* viadrouniki_ios_app.app */;
+			productName = Viadrouniki;
+			productReference = 11EC65C02FFC3E9D000348AE /* Viadrouniki.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -85,7 +85,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 11EC65BB2FFC3E9D000348AE /* Build configuration list for PBXProject "viadrouniki_ios_app" */;
+			buildConfigurationList = 11EC65BB2FFC3E9D000348AE /* Build configuration list for PBXProject "Viadrouniki" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -101,7 +101,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				11EC65BF2FFC3E9D000348AE /* viadrouniki_ios_app */,
+				11EC65BF2FFC3E9D000348AE /* Viadrouniki */,
 			);
 		};
 /* End PBXProject section */
@@ -317,7 +317,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		11EC65BB2FFC3E9D000348AE /* Build configuration list for PBXProject "viadrouniki_ios_app" */ = {
+		11EC65BB2FFC3E9D000348AE /* Build configuration list for PBXProject "Viadrouniki" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				11EC65C92FFC3E9E000348AE /* Debug */,
@@ -326,7 +326,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		11EC65CB2FFC3E9E000348AE /* Build configuration list for PBXNativeTarget "viadrouniki_ios_app" */ = {
+		11EC65CB2FFC3E9E000348AE /* Build configuration list for PBXNativeTarget "Viadrouniki" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				11EC65CC2FFC3E9E000348AE /* Debug */,

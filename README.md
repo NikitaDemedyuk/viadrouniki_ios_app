@@ -37,7 +37,7 @@ third-party packages, MVVM on the Observation framework.
 
 ## Features
 
-Four tabs, defined in [`App/ContentView.swift`](viadrouniki_ios_app/App/ContentView.swift).
+Four tabs, defined in [`App/ContentView.swift`](Viadrouniki/App/ContentView.swift).
 
 **Trips** — a paginated card list of road trips. Tapping through opens a detail screen with a
 photo hero gallery, a stats row (date range, participants, attraction count, route length), the
@@ -74,7 +74,7 @@ View (SwiftUI struct)
 ```
 
 ```
-viadrouniki_ios_app/
+Viadrouniki/
 ├── App/          entry point, TabView root, AppViewModel
 ├── Models/       Trip, Point, Vehicle, AppUser, AppLanguage, response envelopes
 ├── Network/      APIClient + one APIClient+<Domain>.swift extension per resource
@@ -89,13 +89,13 @@ Two rules hold throughout:
   — they expose data and let Views decide presentation.
 - **`Models/` never imports SwiftUI.** When a model needs a `Color`, an SF Symbol or a size class,
   that lives in a `<Type>+<Purpose>.swift` extension under `Views/Components/` — see
-  [`AttractionType+Presentation.swift`](viadrouniki_ios_app/Views/Components/AttractionType+Presentation.swift)
-  and [`PhotoResource+SizeClass.swift`](viadrouniki_ios_app/Views/Components/PhotoResource+SizeClass.swift).
+  [`AttractionType+Presentation.swift`](Viadrouniki/Views/Components/AttractionType+Presentation.swift)
+  and [`PhotoResource+SizeClass.swift`](Viadrouniki/Views/Components/PhotoResource+SizeClass.swift).
   A SwiftUI import appearing under `Models/` means something landed in the wrong folder.
 
 Every network call goes through an `extension APIClient`; endpoint functions build a URL and
 return `try await get(url:)`, while a single `perform(_:)` maps status codes and decode failures
-onto [`APIError`](viadrouniki_ios_app/Network/APIError.swift).
+onto [`APIError`](Viadrouniki/Network/APIError.swift).
 
 ---
 
@@ -108,7 +108,7 @@ The parts of this project that were more interesting than they look.
 iOS ships **no Belarusian display language** — it isn't in the system list, so it can't be chosen
 in Settings and the per-app language picker can't offer it either. The system language is
 therefore deliberately not consulted:
-[`AppLanguage`](viadrouniki_ios_app/Models/AppLanguage.swift) is a `UserDefaults`-backed source of
+[`AppLanguage`](Viadrouniki/Models/AppLanguage.swift) is a `UserDefaults`-backed source of
 truth that the app forces onto the view tree with `.environment(\.locale, language.locale)`.
 
 Two things that don't work the way you'd expect fall out of that:
@@ -176,7 +176,7 @@ project has zero third-party dependencies.
 ```bash
 git clone https://github.com/NikitaDemedyuk/viadrouniki_ios_app.git
 cd viadrouniki_ios_app
-open viadrouniki_ios_app.xcodeproj
+open Viadrouniki.xcodeproj
 ```
 
 Then ⌘R. The app browses public read-only endpoints, so it runs with **no configuration, no API
@@ -185,7 +185,7 @@ key and no account**.
 To build from the command line:
 
 ```bash
-xcodebuild -scheme viadrouniki_ios_app -destination 'generic/platform=iOS Simulator' build
+xcodebuild -scheme Viadrouniki -destination 'generic/platform=iOS Simulator' build
 ```
 
 > **Note:** the repo carries no *shared* scheme, so Xcode auto-creates one on first open. Open the
@@ -194,7 +194,7 @@ xcodebuild -scheme viadrouniki_ios_app -destination 'generic/platform=iOS Simula
 To exercise the signed-in Profile screens while Google sign-in is still a stub, set
 `VIADROUNIKI_DEBUG_TOKEN` in the scheme's environment variables (Product ▸ Scheme ▸ Edit Scheme ▸
 Run ▸ Arguments). It's read under `#if DEBUG` only, in
-[`ViadrounikiApp.swift`](viadrouniki_ios_app/App/ViadrounikiApp.swift) — use an unshared scheme
+[`ViadrounikiApp.swift`](Viadrouniki/App/ViadrounikiApp.swift) — use an unshared scheme
 copy and never commit a token.
 
 ### Formatting
