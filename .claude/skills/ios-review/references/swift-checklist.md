@@ -199,7 +199,7 @@ switched away from.
       who will never see an English UI. Verify rather than eyeball — the catalog is JSON:
       ```bash
       python3 -c "
-      import json; d = json.load(open('viadrouniki_ios_app/Localizable.xcstrings'))
+      import json; d = json.load(open('Viadrouniki/Localizable.xcstrings'))
       for k, v in d['strings'].items():
           if v.get('shouldTranslate') is False: continue
           missing = {'ru', 'be'} - set(v.get('localizations', {}))

@@ -31,7 +31,7 @@ from pathlib import Path
 from PIL import Image, ImageOps
 
 ROOT = Path(__file__).resolve().parent.parent
-DEST = ROOT / "viadrouniki_ios_app/Assets.xcassets/AppIcon.appiconset"
+DEST = ROOT / "Viadrouniki/Assets.xcassets/AppIcon.appiconset"
 VIEWBOX = 10000                           # the source SVG's user-unit canvas
 SIZE = 1024                               # emitted PNG edge, and the App Store's icon size
 PROBE_SIZE = 2048                         # oversampled so the measured centre lands sub-pixel
@@ -42,7 +42,7 @@ VARIANTS = {                              # name: (background, glyph)
     "dark":   ("#1C1C1E", "#FFFFFF"),
     "tinted": ("#000000", "#FFFFFF"),
 }
-SPLASH_DEST = ROOT / "viadrouniki_ios_app/Assets.xcassets/splashLogo.imageset"
+SPLASH_DEST = ROOT / "Viadrouniki/Assets.xcassets/splashLogo.imageset"
 SPLASH_CANVAS = 320                       # points; the imageset's intrinsic size
 SPLASH_SCALE = 0.67                       # glyph fills ~55% of the canvas, centred
 SPLASH_VARIANTS = {"light": "#000000", "dark": "#FFFFFF"}  # glyph colour only — no background

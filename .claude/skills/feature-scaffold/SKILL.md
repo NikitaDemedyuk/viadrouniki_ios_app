@@ -30,7 +30,7 @@ New files placed in the right folder are picked up automatically (the project us
 `PBXFileSystemSynchronizedRootGroup`), so there's no project-file editing — just build:
 
 ```bash
-xcodebuild -scheme viadrouniki_ios_app -destination 'generic/platform=iOS Simulator' build
+xcodebuild -scheme Viadrouniki -destination 'generic/platform=iOS Simulator' build
 ```
 
 ## Before generating anything, gather:

@@ -8,7 +8,7 @@ disagree, this file wins, and the skill should be corrected.
 
 ## Build settings
 
-Read from `viadrouniki_ios_app.xcodeproj/project.pbxproj` (identical in Debug and Release,
+Read from `Viadrouniki.xcodeproj/project.pbxproj` (identical in Debug and Release,
 no `.xcconfig` overrides):
 
 | Setting | Value |
@@ -36,10 +36,10 @@ older equivalents (e.g. `ContentView` uses `.tabItem`/`.tag` rather than `Tab`).
 ## Building
 
 ```bash
-xcodebuild -scheme viadrouniki_ios_app -destination 'generic/platform=iOS Simulator' build
+xcodebuild -scheme Viadrouniki -destination 'generic/platform=iOS Simulator' build
 ```
 
-Single target (`viadrouniki_ios_app`, an application). **There is no test target** — do not
+Single target (`Viadrouniki`, an application). **There is no test target** — do not
 write unit tests or suggest test files until one is added.
 
 The project uses `PBXFileSystemSynchronizedRootGroup`: new `.swift` files dropped into the
@@ -277,7 +277,7 @@ Views/        <Domain>s/ per feature, plus Components/ for shared views
 Utilities/    AuthTokenStore, KeychainStore
 ```
 
-`IconSource/` sits at the **repo root** — a sibling of the synchronized `viadrouniki_ios_app/`
+`IconSource/` sits at the **repo root** — a sibling of the synchronized `Viadrouniki/`
 folder, not inside it — so the icon's source art and generator are versioned without ever
 being swept into the app bundle. `Config/Info.plist` sits there for the same reason: it holds
 only the `UILaunchScreen` dict (see "Launch screen" below), and putting it inside the
@@ -287,9 +287,9 @@ reason — see "Formatting".
 
 ## App icon and splash logo — generated, do not hand-edit
 
-The three PNGs in `viadrouniki_ios_app/Assets.xcassets/AppIcon.appiconset/`
+The three PNGs in `Viadrouniki/Assets.xcassets/AppIcon.appiconset/`
 (`AppIcon-light.png`, `AppIcon-dark.png`, `AppIcon-tinted.png`), and the two SVGs in
-`viadrouniki_ios_app/Assets.xcassets/splashLogo.imageset/` (`splashLogo-light.svg`,
+`Viadrouniki/Assets.xcassets/splashLogo.imageset/` (`splashLogo-light.svg`,
 `splashLogo-dark.svg`, used by the launch screen — see "Launch screen" below) are **build
 output, not authored artwork.** They are produced from `IconSource/viadrouniki_icon.svg` by
 `IconSource/make-app-icon.py` (needs `pip3 install pillow`; **macOS only** — it
