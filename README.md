@@ -174,8 +174,8 @@ to take, and there's no CLI to verify against.
 project has zero third-party dependencies.
 
 ```bash
-git clone https://github.com/NikitaDemedyuk/viadrouniki_ios_app.git
-cd viadrouniki_ios_app
+git clone https://github.com/NikitaDemedyuk/viadrouniki-ios.git
+cd viadrouniki-ios
 open Viadrouniki.xcodeproj
 ```
 
